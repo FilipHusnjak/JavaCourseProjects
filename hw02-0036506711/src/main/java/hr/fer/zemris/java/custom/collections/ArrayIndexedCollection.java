@@ -119,6 +119,14 @@ public class ArrayIndexedCollection extends Collection {
 		return Math.max(other.size(), initialCapacity);
 	}
 	
+	/**
+	 * Checks if this array has enough capacity for 1 more element and if not
+	 * it resizes array to new capacity.
+	 * 
+	 * @param newCapacity
+	 *        new capacity for array if needed
+	 * @return this array that is resized if it was needed
+	 */
 	private Object[] checkAndGrow(int newCapacity) {
 		if (elements.length <= size) {
 			elements = Arrays.copyOf(elements, elements.length * CAPACITY_MULTIPLIER);
@@ -127,6 +135,7 @@ public class ArrayIndexedCollection extends Collection {
 	}
 	
 	/**
+	 * {@inheritDoc} Capacity doubles if its exceeded when adding new element.
 	 * @throws NullPointerException if the given object is {@code null}
 	 */
 	@Override
@@ -149,6 +158,9 @@ public class ArrayIndexedCollection extends Collection {
 		return elements[index];
 	}
 	
+	/**
+	 * {@inheritDoc} The allocated array is left at its current capacity.
+	 */
 	@Override
 	public void clear() {
 		Arrays.fill(elements, 0, size, null);
@@ -196,7 +208,7 @@ public class ArrayIndexedCollection extends Collection {
 	}
 	
 	/**
-	 * Removes element at specified index from collection. Element that was
+	 * Removes the element at specified index from collection. Element that was
 	 * previously at location {@code index + 1} after this operation is at
 	 * location {@code index}.
 	 * 
@@ -211,6 +223,9 @@ public class ArrayIndexedCollection extends Collection {
 		elements[--size] = null;
 	}
 	
+	/**
+	 * {@inheritDoc} Capacity of the allocated array stays the same.
+	 */
 	@Override
 	public boolean remove(Object value) {
 		int index = indexOf(value);
@@ -221,11 +236,17 @@ public class ArrayIndexedCollection extends Collection {
 		return true;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int size() {
 		return size;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean contains(Object value) {
 		return indexOf(value) != -1;
@@ -242,6 +263,9 @@ public class ArrayIndexedCollection extends Collection {
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}}
+	 */
 	@Override
 	public Object[] toArray() {
 		return Arrays.copyOf(elements, size);

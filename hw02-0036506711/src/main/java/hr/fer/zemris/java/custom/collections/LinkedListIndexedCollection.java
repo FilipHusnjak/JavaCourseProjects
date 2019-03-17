@@ -168,6 +168,9 @@ public class LinkedListIndexedCollection extends Collection {
 		size++;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int size() {
 		return size;
@@ -193,6 +196,9 @@ public class LinkedListIndexedCollection extends Collection {
 		return getNode(index).getValue();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void clear() {
 		first = last = null;
@@ -251,6 +257,9 @@ public class LinkedListIndexedCollection extends Collection {
 		removeNode(getNode(index));
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean remove(Object value) {
 		int index = indexOf(value);
@@ -261,11 +270,17 @@ public class LinkedListIndexedCollection extends Collection {
 		return true;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean contains(Object value) {
 		return indexOf(value) != -1;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void forEach(Processor processor) {
 		Objects.requireNonNull(processor, "Processor object cannot be null!");
@@ -274,6 +289,9 @@ public class LinkedListIndexedCollection extends Collection {
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Object[] toArray() {
 		return new ArrayIndexedCollection(this).toArray();
