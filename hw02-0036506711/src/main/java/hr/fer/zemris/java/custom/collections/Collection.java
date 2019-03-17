@@ -110,8 +110,9 @@ public class Collection {
 	}
 	
 	/**
-	 * Removes all of the elements from this collection.
-	 */
+     * Removes all of the elements from this collection. The collection will
+     * be empty after this call returns.
+     */
 	public void clear() {}
 	
 }

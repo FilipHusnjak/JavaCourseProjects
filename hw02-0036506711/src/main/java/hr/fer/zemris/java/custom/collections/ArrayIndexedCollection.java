@@ -1,5 +1,8 @@
 package hr.fer.zemris.java.custom.collections;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Implementation of {@code Collection} that stores elements in an array.
  * 
@@ -8,12 +11,18 @@ package hr.fer.zemris.java.custom.collections;
 public class ArrayIndexedCollection extends Collection {
 
 	/**
-	 * Represents default size of an array when default constructor is called.
+	 * The default capacity of the ArrayIndexedCollection when default
+	 * constructor is called.
 	 */
-	private static int DEFAULT_CAPACITY;
+	private static final int DEFAULT_CAPACITY = 16;
 	
 	/**
-	 * Represents current size of collection.
+	 * Defines the grow rate of the capacity of an array used to store elements.
+	 */
+	private static final int CAPACITY_MULTIPLIER = 2;
+	
+	/**
+	 * The current size of this collection.
 	 */
 	private int size;
 	
@@ -22,14 +31,221 @@ public class ArrayIndexedCollection extends Collection {
 	 */
 	private Object[] elements;
 	
-	public ArrayIndexedCollection(int capacity) {
-		elements = new Object[capacity];
-	}
-	
+	/**
+	 * Constructs an empty {@code ArrayIndexedCollection} with an initial 
+	 * capacity of 16.
+	 */
 	public ArrayIndexedCollection() {
 		this(DEFAULT_CAPACITY);
 	}
 	
+	/**
+	 * Constructs an empty {@code ArrayIndexedCollection} with the specified
+	 * initial capacity.
+	 * 
+	 * @param initialCapacity
+	 *        the initial capacity
+	 * @throws IllegalArgumentException if initial capacity is less than {@code 1}
+	 */
+	public ArrayIndexedCollection(int initialCapacity) {
+		requireGreaterThanZero(initialCapacity);
+		elements = new Object[initialCapacity];
+	}
 	
+	/**
+	 * Constructs an {@code ArrayIndexedCollection} containing the elements 
+	 * of the specified collection. If the size of the given collection is less
+	 * than 16, capacity is set to 16, otherwise capacity is set to the size
+	 * of a given collection.
+	 * 
+	 * @param other
+	 *        the collection whose elements are to be placed into this collection
+	 * @throws NullPointerExceotion if the given collection is {@code null}
+	 */
+	public ArrayIndexedCollection(Collection other) {
+		this(other, DEFAULT_CAPACITY);
+	}
+	
+	/**
+	 * Constructs an {@code ArrayIndexedCollection} containing the elements 
+	 * of the specified collection. The capacity of newly created collection is 
+	 * determined by size of a given collection and given capacity, 
+	 * newCapacity = max(other.size(), initialCapacity).
+	 * 
+	 * @param other
+	 *        the collection whose elements are to be placed into this collection
+	 * @param initialCapacity
+	 *        wanted capacity of the new collection
+	 * @throws NullPointerExceotion if the given collection is {@code null}
+	 * @throws IllegalArgumentException if expected capacity is less than {@code 1}
+	 */       
+	public ArrayIndexedCollection(Collection other, int initialCapacity) {
+		this(returnExpectedCapacity(other, initialCapacity));
+		addAll(other);
+	}
+	
+	/**
+	 * Checks if given argument is greater than 0, if not IllegalArgumentException
+	 * is thrown.
+	 * 
+	 * @param initialCapacity
+	 *        argument to be checked
+	 * @return given argument
+	 * @throws IllegalArgumentException if the given argument is less than 1
+	 */
+	private static int requireGreaterThanZero(int initialCapacity) {
+		if (initialCapacity < 1) {
+			throw new IllegalArgumentException("Capacity must be greater "
+					+ "than 0, provided capacity = " + initialCapacity);
+		}
+		
+		return initialCapacity;
+	}
+	
+	/**
+	 * Returns expected capacity determined by given arguments. Capacity is set
+	 * to max(other.size(), initialCapacity).
+	 * 
+	 * @param other
+	 *        the collection whose size is used in calculation
+	 * @param initialCapacity
+	 *        initial capacity whose value is used in calculation
+	 * @return expected capacity
+	 * @throws NullPointerExceotion if the given collection is {@code null}
+	 */
+	private static int returnExpectedCapacity(Collection other, int initialCapacity) {
+		other = Objects.requireNonNull(other, "Given Collection cannot be null!");
+		initialCapacity = requireGreaterThanZero(initialCapacity);
+		return Math.max(other.size(), initialCapacity);
+	}
+	
+	private Object[] checkAndGrow(int newCapacity) {
+		if (elements.length <= size) {
+			elements = Arrays.copyOf(elements, elements.length * CAPACITY_MULTIPLIER);
+		} 
+		return elements;
+	}
+	
+	/**
+	 * @throws NullPointerException if the given object is {@code null}
+	 */
+	@Override
+	public void add(Object value) {
+		Objects.requireNonNull(value, "Given object cannot be null!");
+		elements = checkAndGrow(CAPACITY_MULTIPLIER * elements.length);
+		elements[size++] = value;
+	}
+	
+	/**
+	 * Returns the element at the specified position in this collection.
+	 * 
+	 * @param index
+	 *        index of the element to return
+	 * @return the element at the specified position in this collection
+	 * @throws IndexOutOfBoundsException if the specified index is out of range
+	 */
+	public Object get(int index) {
+		Objects.checkIndex(index, size);
+		return elements[index];
+	}
+	
+	@Override
+	public void clear() {
+		Arrays.fill(elements, 0, size, null);
+		size = 0;
+	}
+	
+	/**
+	 * Inserts the specified element at the specified position in this array.
+	 * 
+	 * @param value
+	 *        value to be inserted
+	 * @param position
+	 *        index at which the specified element is to be inserted
+	 * @throws NullPointerException if given object is null
+	 * @throws IndexOutOfBoundsException if the specified index is out of range
+	 */
+	// Average complexity of this method is O(size)
+	public void insert(Object value, int position) {
+		Objects.requireNonNull(value, "Given object cannot be null!");
+		elements = checkAndGrow(CAPACITY_MULTIPLIER * elements.length);
+		Objects.checkIndex(position, size + 1);
+		for (int i = size; i > position; --i) {
+			elements[i] = elements[i - 1];
+		}
+		elements[position] = value;
+	}
+	
+	/**
+	 * Returns the position of the first occurrence of a specified element
+	 * or {@code -1} if element is not found.
+	 * 
+	 * @param value
+	 *        element whose index is to be found
+	 * @return position of the first occurrence of an element in an array 
+	 *         or -1 if the element is not found
+	 */
+	// Average complexity of this method is O(size)
+	public int indexOf(Object value) {
+		for (int i = 0; i < size; ++i) {
+			if (Objects.equals(elements[i], value)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	/**
+	 * Removes element at specified index from collection. Element that was
+	 * previously at location {@code index + 1} after this operation is at
+	 * location {@code index}.
+	 * 
+	 * @param index
+	 * @throws IndexOutOfBoundsException if the specified index is out of range
+	 */
+	public void remove(int index) {
+		Objects.checkIndex(index, size);
+		for (int i = index; i < size - 1; ++i) {
+			elements[i] = elements[i + 1];
+		}
+		elements[--size] = null;
+	}
+	
+	@Override
+	public boolean remove(Object value) {
+		int index = indexOf(value);
+		if (index == -1) {
+			return false;
+		}
+		remove(index);
+		return true;
+	}
+	
+	@Override
+	public int size() {
+		return size;
+	}
+	
+	@Override
+	public boolean contains(Object value) {
+		return indexOf(value) != -1;
+	}
+	
+	/**
+	 * @throws NullPointerException if the given processor object is {@code null}
+	 */
+	@Override
+	public void forEach(Processor processor) {
+		Objects.requireNonNull(processor, "Processor object cannot be null!");
+		for (int i = 0; i < size; ++i) {
+			processor.process(get(i));
+		}
+	}
+	
+	@Override
+	public Object[] toArray() {
+		return Arrays.copyOf(elements, size);
+	}
 	
 }
+
