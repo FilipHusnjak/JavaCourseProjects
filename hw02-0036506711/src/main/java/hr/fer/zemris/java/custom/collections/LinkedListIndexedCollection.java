@@ -177,6 +177,7 @@ public class LinkedListIndexedCollection extends Collection {
 	}
 	
 	/**
+	 * {@inheritDoc}
 	 * @throws NullPointerException if the given value is null
 	 */
 	@Override
@@ -207,6 +208,7 @@ public class LinkedListIndexedCollection extends Collection {
 	
 	/**
 	 * Inserts the specified element at the specified position in this collection.
+	 * Average complexity of this method is O(size / 2 + 1)
 	 * 
 	 * @param value
 	 *        value to be inserted
@@ -215,7 +217,6 @@ public class LinkedListIndexedCollection extends Collection {
 	 * @throws NullPointerException if given object is null
 	 * @throws IndexOutOfBoundsException if the specified index is out of range
 	 */
-	// Average complexity of this method is O(size / 2 + 1)
 	public void insert(Object value, int position) {
 		if (position == size) {
 			addBefore(null, value);
@@ -227,14 +228,14 @@ public class LinkedListIndexedCollection extends Collection {
 	
 	/**
 	 * Returns the position of the first occurrence of a specified element
-	 * or {@code -1} if element is not found.
+	 * or {@code -1} if element is not found. 
+	 * Average complexity of this method is O(size)
 	 * 
 	 * @param value
 	 *        element whose index is to be found
 	 * @return position of the first occurrence of an element in an array 
 	 *         or -1 if the element is not found
 	 */
-	// Average complexity of this method is O(size)
 	public int indexOf(Object value) {
 		int index = 0;
 		for (ListNode node = first; node != null; node = node.next, index++) {
