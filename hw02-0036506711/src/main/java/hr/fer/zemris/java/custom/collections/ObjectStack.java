@@ -1,7 +1,8 @@
 package hr.fer.zemris.java.custom.collections;
 
 /**
- * Objects of this class store data on a stack.
+ * Stack representation that stores {@code Object} instances 
+ * and contains proper methods.
  * 
  * @author Filip Husnjak
  */
@@ -51,6 +52,7 @@ public class ObjectStack {
 	/**
 	 * Returns the element on the top of the stack and removes it.
 	 * 
+	 * @return the element on the top of the stack
 	 * @throws EmptyStackException if stack is empty
 	 */
 	public Object pop() {

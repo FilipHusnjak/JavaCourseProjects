@@ -6,7 +6,7 @@ import hr.fer.zemris.java.custom.collections.ArrayIndexedCollection;
 import hr.fer.zemris.java.custom.collections.LinkedListIndexedCollection;
 import hr.fer.zemris.java.custom.collections.Processor;
 
-public class Demo {
+public class CollectionsDemo {
 	
 	public static void main(String[] args) {
 		ArrayIndexedCollection col = new ArrayIndexedCollection(2);

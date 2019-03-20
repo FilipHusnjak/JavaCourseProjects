@@ -3,7 +3,7 @@ package hr.fer.zemris.java.custom.collections;
 import java.util.Objects;
 
 /**
- * Implementation of {@code Collection} that stores elements in a linked list.
+ * Implementation of {@code Collection} that stores elements in a doubly linked list.
  * 
  * @author Filip Husnjak
  */
@@ -84,14 +84,17 @@ public class LinkedListIndexedCollection extends Collection {
 	
 	/**
 	 * Returns node at specified index.
+	 * <br>
+	 * Average complexity of this method is {@code O(currentSize / 2 + 1)}.
 	 * 
 	 * @param index
 	 *        index of the node to return
 	 * @return node at specified index
-	 * @throws IndexOutOfBoundsException if index is out of range
+	 * @throws IndexOutOfBoundsException if index is out of range of {@code this Collection}
 	 */
 	private ListNode getNode(int index) {
 		Objects.checkIndex(index, size);
+		// If index is less than {@code currentSize / 2} start from the beginning, otherwise start from the end.
 		if (index < (size >> 1)) {
             ListNode node = first;
             for (int i = 0; i < index; i++)
@@ -114,9 +117,9 @@ public class LinkedListIndexedCollection extends Collection {
 	 */
 	private void removeNode(ListNode node) {
 		if (node == null) return;
+		
 		ListNode prev = node.prev;
 		ListNode next = node.next;
-		
 		if (prev == null) {
 			first = next;
 		} else {
@@ -134,14 +137,14 @@ public class LinkedListIndexedCollection extends Collection {
 	}
 	
 	/**
-	 * Links node with specified value before specified node. If null is given 
-	 * as node argument new node will be added at the end of the list.
+	 * Links node with specified {@code value} before given {@code node}. If {@code null} is given 
+	 * as node argument new node will be added to the end of the list.
 	 * 
 	 * @param node
 	 *        node before which new node needs to be inserted
 	 * @param value
 	 *        value of a new node
-	 * @throws NullPointerException if given object is null
+	 * @throws NullPointerException if given {@code value} is {@code null}
 	 */
 	private void addBefore(ListNode node, Object value) {
 		Objects.requireNonNull(value, "Given object cannot be null!");
@@ -155,15 +158,14 @@ public class LinkedListIndexedCollection extends Collection {
 				newNode.prev = last;
 				last = newNode;
 			}
-			
 		} else {
 			if (node.prev == null) {
 				first = newNode;
 			} else {
 				node.prev.next = newNode;
 				newNode.prev = node.prev;
-				node.prev = newNode;
 			}
+			node.prev = newNode;
 		}
 		size++;
 	}
@@ -208,7 +210,8 @@ public class LinkedListIndexedCollection extends Collection {
 	
 	/**
 	 * Inserts the specified element at the specified position in this collection.
-	 * Average complexity of this method is O(size / 2 + 1)
+	 * <br>
+	 * Average complexity of this method is O(currentSize / 2 + 1)
 	 * 
 	 * @param value
 	 *        value to be inserted

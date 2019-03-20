@@ -1,5 +1,6 @@
 package hr.fer.zemris.java.custom.collections;
 
+import java.util.Objects;
 
 /**
  * Represents a group of objects.
@@ -48,8 +49,7 @@ public class Collection {
 	
 	/**
 	 * Returns {@code true} if this collection contains given value, 
-	 * as determined by equals method and removes one occurrence of it
-	 * (not specified which one).
+	 * as determined by equals method and removes the first occurrence of it.
 	 * 
 	 * @param value 
 	 *        element to be removed from this collection, if present
@@ -82,9 +82,11 @@ public class Collection {
 	 * Adds all of the elements in the specified collection to this collection.
 	 * 
 	 * @param other
-	 *        collection containing elements to be added to this collection
+	 *        collection containing elements to be added into this collection
+	 * @throws NullPointerException if the given Collection is {@code null}
 	 */
 	public void addAll(Collection other) {
+		Objects.requireNonNull(other);
 		
 		/**
 		 * Represents an operation that adds each given object to the 
@@ -104,9 +106,7 @@ public class Collection {
 			}
 			
 		}
-
 		other.forEach(new AddToCollectionProcessor());
-		
 	}
 	
 	/**

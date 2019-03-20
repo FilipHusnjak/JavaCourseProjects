@@ -12,59 +12,65 @@ import java.util.Objects;
 public class ComplexNumber {
 
 	/**
-	 * real part of this {@code ComplexNumber}
+	 * Real part of this {@code ComplexNumber}
 	 */
 	private final double real;
 
 	/**
-	 * imaginary part of this {@code ComplexNumber}
+	 * Imaginary part of this {@code ComplexNumber}
 	 */
 	private final double imaginary;
 	
 	/**
-	 * magnitude of this {@code ComplexNumber}
+	 * Magnitude of this {@code ComplexNumber}
 	 */
 	private final double magnitude;
 	
 	/**
-	 * phase of this {@code ComplexNumber}
+	 * Phase of this {@code ComplexNumber}
 	 */
 	private final double angle;
 	
 	/**
-	 * tells if this {@code ComplexNumber} has NaN values in either field
+	 * Tells if this {@code ComplexNumber} has NaN values in either field
 	 */
     private final boolean isNaN;
 	
     /**
-	 * tells if this {@code ComplexNumber} has only finite values
+	 * Tells if this {@code ComplexNumber} has only finite values
 	 */
 	private final boolean isFinite;
 	
 	/**
-	 * represents {@code ComplexNumber} that has all fields set to {@code ZERO}
+	 * Represents {@code ComplexNumber} that has all fields set to {@code ZERO}
 	 */
-	private static final ComplexNumber ZERO = new ComplexNumber(0, 0);
+	public static final ComplexNumber ZERO = new ComplexNumber(0, 0);
 	
 	/**
-	 * represents {@code ComplexNumber} that has both real and imaginary part set to {@code Infinity}
+	 * Represents {@code ComplexNumber} that has both real and imaginary part set to {@code Infinity}
 	 */
-	private static final ComplexNumber INFINITE = new ComplexNumber(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+	public static final ComplexNumber INFINITE = new ComplexNumber(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 	
 	/**
-	 * represents {@code ComplexNumber} that has both real and imaginary part set to {@code NaN}
+	 * Represents {@code ComplexNumber} that has both real and imaginary part set to {@code NaN}
 	 */
-	private static final ComplexNumber NaN = new ComplexNumber(Double.NaN, Double.NaN);
+	public static final ComplexNumber NaN = new ComplexNumber(Double.NaN, Double.NaN);
 
 	/**
-	 * Represents generic IllegalArgumentException message when parsing {@code String} to {@code ComplexNumber}.
+	 * Represents generic IllegalArgumentException message when parsing {@code String} to {@code ComplexNumber}
 	 */
 	private static final String GENERIC_PARSE_EXCEPTION = "Given string cannot be interpreted as complex number! Reason: ";
 
 	/**
-	 * Represents generic NullPointerException message when null is passed instead of {@code ComplexNumber}.
+	 * Represents generic NullPointerException message when null is passed instead of {@code ComplexNumber}
 	 */
 	private static final String GENERIC_COMPLEX_NULLPOINTER_EXCEPTION = "Given ComplexNumber cannot be null!";
+	
+	/**
+	 * Represents precision of the equals method when comparing double fields, its calculated by formula: <br>
+	 * {@code Math.abs(this.field - other.field) < Math.pow(10, PRECISION_POWER)}, if it returns {@code true} fields are treated as same
+	 */
+	private static final int PRECISION_POWER = -6;
 	
 	/**
 	 * Constructs {@code ComplexNumber} with given real and imaginary parths.
@@ -107,13 +113,25 @@ public class ComplexNumber {
 	public static ComplexNumber fromImaginary(double imaginary) {
 		return new ComplexNumber(0.0f, imaginary);
 	}
-
+	
+	/**
+	 * Returns {@code ComplexNumber} with specified {@code magnitude} and phase
+	 * {@code angle}.
+	 * 
+	 * @param magnitude
+	 *        magnitude of a new {@code ComplexNumber}
+	 * @param angle
+	 *        phase angle of a new {@code ComplexNumber}
+	 * @return new {@code ComplexNumber} with specified magnitude and phase angle
+	 */
 	public static ComplexNumber fromMagnitudeAndAngle(double magnitude, double angle) {
 		return new ComplexNumber(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
 	}
 	
 	/**
-	 * Returns new {@code ComplexNumber} by converting given {@code String} 
+	 * Returns new {@code ComplexNumber} by converting given {@code String}.
+	 * <br>
+	 * Blanks in the expression are not allowed.
 	 * 
 	 * @param s {@code String} to be converted to {@code ComplexNumber}
 	 * @return {@code ComplexNumber} converted from given {@code String}
@@ -183,16 +201,27 @@ public class ComplexNumber {
 			throw new IllegalArgumentException(GENERIC_PARSE_EXCEPTION + 
 					"Imaginary part of a complex number cannot be empty String!");
 		}
+		if (!s.endsWith("i")) {
+			throw new IllegalArgumentException(GENERIC_PARSE_EXCEPTION + 
+					"Imaginary part of a complex number has to end with 'i'!");
+		}
 		try {
 			String number = s.substring(0, s.length() - 1);
 			// Triggers when only {@code i} is given.
 			if (number.isEmpty()) {
 				return 1.0f;
 			}
+			if (number.length() == 1) {
+				if (number.startsWith("+")) {
+					return 1.0f;
+				} else if (number.startsWith("-")) {
+					return -1.0f;
+				}
+			}
 			return Double.parseDouble(number);
 		} catch (NumberFormatException ex) {
 			throw new IllegalArgumentException(GENERIC_PARSE_EXCEPTION +  
-					"Imaginary part of a given complex number cannot be interpreted as a number!");
+					"Imaginary part of a given complex number cannot be interpreted as a number!" + s);
 		}
 	}
 	
@@ -321,18 +350,18 @@ public class ComplexNumber {
      * @return reciprocal value of a given {@code ComplexNumber} as a new {@code ComplexNumber}
      * @throws NullPointerException if given {@code ComplexNumber} is {@code null}
      */
-    private ComplexNumber reciprocal(ComplexNumber c) {
+    private static ComplexNumber reciprocal(ComplexNumber c) {
     	Objects.requireNonNull(c, GENERIC_COMPLEX_NULLPOINTER_EXCEPTION);
     	if (c.isNaN) {
     		return NaN;
     	}
-    	if (!this.isFinite) {
+    	if (!c.isFinite) {
     		return ZERO;
     	}
     	if (c.getReal() == 0 && c.getImaginary() == 0) {
     		return INFINITE;
     	}
-    	double squaredMagnitude = magnitude * magnitude;
+    	double squaredMagnitude = c.getMagnitude() * c.getMagnitude();
     	return new ComplexNumber(c.getReal() /squaredMagnitude, -c.getImaginary() / squaredMagnitude);
     }
     
@@ -366,11 +395,11 @@ public class ComplexNumber {
     	if (this.isNaN || c.isNaN) {
     		return NaN;
     	}
-    	if (!this.isFinite && !c.isFinite) {
-    		return NaN;
-    	}
     	if (this.isFinite && !c.isFinite) {
     		return ZERO;
+    	}
+    	if (!this.isFinite || !c.isFinite) {
+    		return NaN;
     	}
     	if (c.getReal() == 0 && c.getImaginary() == 0) {
     		return NaN;
@@ -407,7 +436,8 @@ public class ComplexNumber {
     }
     
     /**
-     * Computes the {@code n-th} root of this {@code ComplexNumber}.
+     * Computes the {@code n-th} root of this {@code ComplexNumber}. Degree of the
+     * root has to be positive number.
      * <ul>
      *  <li>If {@code this} has a {@code NaN} value in either part, 
      *  {@link #NaN} is returned.
@@ -418,7 +448,7 @@ public class ComplexNumber {
      * </ul>
      * 
      * @param n
-     *        degree of a root
+     *        degree of a root, has to be positive or exception will be thrown
      * @return {@code n-th} root of {@code this} {@code ComplexNumber}
      * @throws IllegalArgumentException if the given number is less than or equal to
      *         {@code ZERO}
@@ -427,13 +457,13 @@ public class ComplexNumber {
     	if (n <= 0) {
     		throw new IllegalArgumentException("Given number has to be positive!");
     	}
-    	ComplexNumber[] roots = new ComplexNumber[n];
     	if (isNaN) {
     		return new ComplexNumber[] {NaN};
     	}
     	if (!isFinite) {
     		return new ComplexNumber[] {INFINITE};
     	}
+    	ComplexNumber[] roots = new ComplexNumber[n];
     	double newMagnitude = Math.pow(magnitude, 1.0f / n);
     	for (int i = 0; i < roots.length; ++i) {
     		roots[i] = fromMagnitudeAndAngle(newMagnitude, (angle + 2 * i * Math.PI) / n);
@@ -446,12 +476,57 @@ public class ComplexNumber {
      */
     @Override
     public String toString() {
-    	if (imaginary > 0) {
-    		return String.format("%f%fi", real, imaginary);
+    	if (imaginary < 0) {
+    		return String.format("%.4f%.4fi", real, imaginary);
     	}
     	else {
-    		return String.format("%f+%fi", real, imaginary);
+    		return String.format("%.4f+%.4fi", real, imaginary);
     	}
     }
-    
+
+    /**
+     * {@inheritDoc}}
+     */
+	@Override
+	public int hashCode() {
+		return Objects.hash(angle, imaginary, isFinite, isNaN, magnitude, real);
+	}
+
+	/**
+     * {@inheritDoc}}
+     */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ComplexNumber))
+			return false;
+		ComplexNumber other = (ComplexNumber) obj;
+		return Math.abs(angle - other.angle) < Math.pow(10, PRECISION_POWER)
+				&& Math.abs(imaginary - other.imaginary) < Math.pow(10, PRECISION_POWER)
+				&& isFinite == other.isFinite && isNaN == other.isNaN
+				&& Math.abs(magnitude - other.magnitude) < Math.pow(10, PRECISION_POWER)
+				&& Math.abs(real - other.real) < Math.pow(10, PRECISION_POWER);
+	}
+
+	/**
+	 * Returns {@code true} if this {@code ComplexNumber} is {@code NaN}.
+	 * 
+	 * @return {@code true} if this {@code ComplexNumber} is {@code NaN}
+	 */
+	public boolean isNaN() {
+		return isNaN;
+	}
+
+	/**
+	 * Returns {@code true} if this {@code ComplexNumber} is {@code finite}.
+	 * 
+	 * @return {@code true} if this {@code ComplexNumber} is {@code finite}
+	 */
+	public boolean isFinite() {
+		return isFinite;
+	}
+	
 }

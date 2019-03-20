@@ -13,10 +13,10 @@ import hr.fer.zemris.java.custom.collections.ObjectStack;
 public class StackDemo {
 
 	/**
-	 * Reads 1 parameter given through console and evaluates that expression.
+	 * Reads 1 parameter given as program argument and evaluates that expression.
 	 * 
 	 * @param args
-	 *        parameter given through console
+	 *        parameter given as argument that represents expression
 	 */
 	public static void main(String[] args) {
 		if (args.length != 1) {
@@ -24,7 +24,23 @@ public class StackDemo {
 			return;
 		}
 		
-		String[] params = args[0].split("\\s+");
+		try {
+			System.out.println("Expression evaluates to " + evaluate(args[0]) + ".");
+		} catch (IllegalArgumentException ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+	
+	/**
+	 * Evaluates given expression and returns the result as {@code integer}.
+	 * 
+	 * @param expression
+	 *        expression to be evaluated
+	 * @return {@code integer} representation of the result of an expression
+	 * @throws IllegalArgumentException if the expression is invalid
+	 */
+	public static int evaluate(String expression) {
+		String[] params = expression.split("\\s+");
 		ObjectStack stack = new ObjectStack();
 		
 		for (int i = 0; i < params.length; ++i) {
@@ -33,10 +49,9 @@ public class StackDemo {
 		
 		if (stack.size() != 1) {
 			invalidExpression("Stack size at the end is not one!");
-			return;
 		}
 		
-		System.out.println("Expression evaluates to " + stack.pop() + ".");
+		return (Integer) stack.pop();
 	}
 	
 	/**
@@ -56,22 +71,21 @@ public class StackDemo {
 				stack.push(calculate((Integer)stack.pop(), (Integer)stack.pop(), character));
 			} catch (EmptyStackException ex2) {
 				invalidExpression("Popping from empty stack!");
-				System.exit(1);
 			} catch (ClassCastException | ArithmeticException | IllegalArgumentException ex2) {
 				invalidExpression(ex2.getMessage());
-				System.exit(1);
 			}
 		}
 	}
 	
 	/**
-	 * Writes the given message to {@code System.err} with appropriate explanation.
+	 * Throws {@code IllegalArgumentException} with appropriate explanation.
 	 * 
 	 * @param msg
-	 *        message to be written
+	 *        message to be sent to {@code IllegalArgumentException} constructor
+	 * @throws IllegalArgumentException always
 	 */
 	private static void invalidExpression(String msg) {
-		System.err.println("Expression is invalid! Reason: " + msg);
+		throw new IllegalArgumentException("Expression is invalid! Reason: " + msg);
 	}
 	
 	/**
