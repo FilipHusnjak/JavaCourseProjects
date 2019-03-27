@@ -5,14 +5,14 @@ package hr.fer.zemris.java.custom.scripting.lexer;
  * 
  * @author Filip Husnjak
  */
-public class LexerException extends RuntimeException {
+public class SmartScriptLexerException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Constructs an {@code LexerException} without additional message.
 	 */
-	public LexerException() {
+	public SmartScriptLexerException() {
 		super();
 	}
 	
@@ -22,7 +22,7 @@ public class LexerException extends RuntimeException {
 	 * @param message
 	 *        message to be written
 	 */
-	public LexerException(String message) {
+	public SmartScriptLexerException(String message) {
 		super(message);
 	}
 	

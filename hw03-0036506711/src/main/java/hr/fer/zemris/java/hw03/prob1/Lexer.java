@@ -6,8 +6,7 @@ import java.util.Objects;
  * Lexer with 2 states that tokenizes input text depending on the current state.
  * If the current state is set to {@code LexerState.BASIC} it tokenizes numbers, words
  * and symbols. If the current state is set to {@code LexerState.EXTENDED} it can only
- * tokenize words and symbols. If Lexer reads character '#' it switches state. State
- * can also be set using the proper method.
+ * tokenize words and symbols. LexerState can be set using the proper method.
  * 
  * @author Filip Husnjak
  */
@@ -83,7 +82,6 @@ public class Lexer {
 	 */
 	private Token extendedLexerState() {
 		if (data[currentIndex] == '#') {
-			switchState();
 			return new Token(TokenType.SYMBOL, data[currentIndex++]);
 		}
 		StringBuilder word = new StringBuilder();
@@ -125,18 +123,7 @@ public class Lexer {
 				throw new LexerException("Number is too big to be interpreted as long!");
 			}
 		}
-		if (data[currentIndex] == '#') {
-			switchState();
-		}
 		return new Token(TokenType.SYMBOL, data[currentIndex++]);
-	}
-	
-	/**
-	 * Switches the {@link #currentState} from {@code LexerState.BASIC} to {@code LexerState.EXTENDED},
-	 * or from {@code LexerState.EXTENDED} to {@code LexerState.BASIC}.
-	 */
-	private void switchState() {
-		setState(currentState == LexerState.BASIC ? LexerState.EXTENDED : LexerState.BASIC);
 	}
 	
 	/**

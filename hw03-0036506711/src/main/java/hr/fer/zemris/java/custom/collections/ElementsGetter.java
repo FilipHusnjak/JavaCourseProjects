@@ -42,6 +42,8 @@ public interface ElementsGetter {
 	 *        {@code Processor} object which determines an operation to be performed
 	 *        on each remaining element
 	 * @throws NullPointerException if the given {@code Processor} is {@code null}
+	 * @throws ConcurrentModificationException if the collection was modified
+     *         after {@code this} iterator was created
 	 */
 	default void processRemaining(Processor processor) {
 		Objects.requireNonNull(processor, "Given processor cannot be null!");

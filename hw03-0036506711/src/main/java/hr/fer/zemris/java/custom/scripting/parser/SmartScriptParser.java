@@ -6,65 +6,99 @@ import hr.fer.zemris.java.custom.collections.ArrayIndexedCollection;
 import hr.fer.zemris.java.custom.collections.EmptyStackException;
 import hr.fer.zemris.java.custom.collections.ObjectStack;
 import hr.fer.zemris.java.custom.scripting.elems.*;
-import hr.fer.zemris.java.custom.scripting.lexer.Lexer;
-import hr.fer.zemris.java.custom.scripting.lexer.LexerException;
-import hr.fer.zemris.java.custom.scripting.lexer.Token;
-import hr.fer.zemris.java.custom.scripting.lexer.TokenType;
+import hr.fer.zemris.java.custom.scripting.lexer.SmartScriptLexer;
+import hr.fer.zemris.java.custom.scripting.lexer.SmartScriptLexerException;
+import hr.fer.zemris.java.custom.scripting.lexer.SmartScriptLexerState;
+import hr.fer.zemris.java.custom.scripting.lexer.SmartScriptToken;
+import hr.fer.zemris.java.custom.scripting.lexer.SmartScriptTokenType;
 import hr.fer.zemris.java.custom.scripting.nodes.*;
 
 public class SmartScriptParser {
 
-	private Lexer lexer;
+	/**
+	 * Lexer used to tokenize input.
+	 */
+	private SmartScriptLexer lexer;
 	
+	/**
+	 * Root node of a document.
+	 */
 	private DocumentNode document = new DocumentNode();
 	
+	/**
+	 * Stack used for creating document tree.
+	 */
+	private ObjectStack nodes = new ObjectStack();
+	
+	/**
+	 * Represents list of possible operators.
+	 */
+	private static ArrayIndexedCollection operators = new ArrayIndexedCollection();
+	
+	static {
+		operators.add('+');
+		operators.add('-');
+		operators.add('*');
+		operators.add('/');
+		operators.add('^');
+	}
+	
+	/**
+	 * Constructs {@code SmartScriptParser} object, initializes {@link #lexer} and
+	 * creates document tree.
+	 * 
+	 * @param body
+	 *        expression to be parsed
+	 * @throws SmartScriptParserException expression cannot be parsed
+	 * @throws NullPointerException if the given {@code String} is {@code null}
+	 */
 	public SmartScriptParser(String body) {
-		lexer = new Lexer(body);
-		ObjectStack nodes = new ObjectStack();
+		lexer = new SmartScriptLexer(body);
+		try {
+            parse();
+        } catch (Exception e) {
+            throw new SmartScriptParserException(e.getMessage());
+        }
+	}
+	
+	/**
+	 * Parses the given expression with the help of {@link #lexer}. If the expression cannot
+	 * be parsed {@code SmartScriptParserException} is thrown.
+	 * 
+	 * @throws SmartScriptParserException if the expression cannot be parsed
+	 */
+	private void parse() {
 		nodes.push(document);
 		try {
-			for (Token token = lexer.nextToken(); token.getType() != TokenType.EOF; token = lexer.nextToken()) {
-				if (token.getType() == TokenType.TEXT) {
+			for (SmartScriptToken token = lexer.nextToken(); token.getType() != SmartScriptTokenType.EOF; token = lexer.nextToken()) {
+				if (token.getType() == SmartScriptTokenType.TEXT) {
 					((Node) nodes.peek()).addChildNode(new TextNode((String)token.getValue()));
-				} else if (token.getType() == TokenType.TAG) {
+					
+				} else if (token.getType() == SmartScriptTokenType.TAG) {
+					lexer.setState(SmartScriptLexerState.INSIDE_TAG);
 					if (token.getValue().equals("END")) {
-						if (lexer.nextToken().getType() != TokenType.CLOSE_TAG) {
-							throw new SmartScriptParserException("END tag without closing it!");
+						if (lexer.nextToken().getType() != SmartScriptTokenType.CLOSE_TAG) {
+							throw new SmartScriptParserException("END tag without closing brackets!");
 						}
 						nodes.pop();
+						
 					} else if (token.getValue().equals("FOR")) {
-						Token variable = lexer.nextToken();
-						if (variable.getType() != TokenType.VARIABLE) {
-							throw new SmartScriptParserException(String.format("%s is not a variable name!", variable.getValue()));
-						}
-						Token from = lexer.nextToken();
-						checkVariableOrNumber(from);
-						Token to = lexer.nextToken();
-						checkVariableOrNumber(to);
-						Token counter = lexer.nextToken();
-						Element counterElem = null;
-						if (counter.getType() != TokenType.CLOSE_TAG) {
-							if (lexer.nextToken().getType() != TokenType.CLOSE_TAG) {
-								throw new SmartScriptParserException("No closing tag provided!");
-							}
-							counterElem = checkVariableOrNumber(counter);
-						}
-						ForLoopNode forLoopNode = new ForLoopNode(new ElementVariable(variable.getValue().toString()),
-								checkVariableOrNumber(from), checkVariableOrNumber(to), counterElem);
-						((Node) nodes.peek()).addChildNode(forLoopNode);
-						nodes.push(forLoopNode);
+						ForLoopNode forNode = parseFor();
+						((Node) nodes.peek()).addChildNode(forNode);
+						nodes.push(forNode);
+						
 					} else if (token.getValue().equals("=")) {
-						ArrayIndexedCollection elements = new ArrayIndexedCollection();
-						for (Token elem = lexer.nextToken(); elem.getType() != TokenType.CLOSE_TAG; elem = lexer.nextToken()) {
-							elements.add(getRightElement(elem));
-						}
-						((Node) nodes.peek()).addChildNode(new EchoNode(Arrays.copyOf(elements.toArray(), elements.toArray().length, Element[].class)));
+						((Node) nodes.peek()).addChildNode(parseEquals());
+						
+					} else {
+						throw new SmartScriptParserException("Unexpected TAG name during parsing! TAG: " + token.getValue());
 					}
+					lexer.setState(SmartScriptLexerState.DOCUMENT_TEXT);
 				} else {
-					throw new SmartScriptParserException("Unexpected expression during parsing! : " + token.getType());
+					throw new SmartScriptParserException("Unexpected expression during parsing! TAG: " + token.getValue());
 				}
 			}
-		} catch (LexerException ex) {
+		} catch (SmartScriptLexerException ex) {
 			throw new SmartScriptParserException(ex.getMessage());
 		} catch (EmptyStackException ex) {
 			throw new SmartScriptParserException("Expression contains more END tags than opened non-empty tags!");
@@ -74,33 +108,110 @@ public class SmartScriptParser {
 		}
 	}
 	
-	private Element checkVariableOrNumber(Token check) {
-		if (check.getType() == TokenType.VARIABLE) {
-			return new ElementString(check.getValue().toString());
+	/**
+	 * Parses {@code Echo TAG} and returns proper {@code EchoNode} with parsed elements.
+	 * 
+	 * @return proper {@code EchoNode} with parsed elements
+	 * @throws SmartScriptLexerException if {@code SmartScriptLexer} cannot extract next token
+	 */
+	private EchoNode parseEquals() {
+		ArrayIndexedCollection elements = new ArrayIndexedCollection();
+		for (SmartScriptToken elem = lexer.nextToken(); elem.getType() != SmartScriptTokenType.CLOSE_TAG; elem = lexer.nextToken()) {
+			elements.add(getMatchingElementEqualsTag(elem));
 		}
-		try {
-			Integer num = Integer.parseInt(check.getValue().toString());
-			return check.getType() == TokenType.TEXT ? new ElementString("\"" + check.getValue().toString() + "\"") : new ElementConstantInteger(num);
-		} catch (NumberFormatException ex1) {
-			try {
-				Double num = Double.parseDouble(check.getValue().toString());
-				return check.getType() == TokenType.TEXT ? new ElementString("\"" + check.getValue().toString() + "\"") : new ElementConstantDouble(num);
-			} catch (NumberFormatException ex2) {
-				throw new SmartScriptParserException(String.format("%s is not a number or variable!", check.getValue()));
+		return new EchoNode(Arrays.copyOf(elements.toArray(), elements.toArray().length, Element[].class));
+	}
+	
+	/**
+	 * Parses {@code For TAG} and returns proper {@code ForLoopNode} with parsed elements.
+	 * 
+	 * @return proper {@code EchoNode} with parsed elements
+	 * @throws SmartScriptLexerException if {@code SmartScriptLexer} cannot extract next token
+	 * @throws SmartScriptParserException if unexpected type of {@code SmartScriptTokens} where tokenized,
+	 *         or {@code For TAG} is not written properly
+	 */
+	private ForLoopNode parseFor() {
+		SmartScriptToken variable = lexer.nextToken();
+		if (variable.getType() != SmartScriptTokenType.VARIABLE) {
+			throw new SmartScriptParserException(String.format("%s is not a variable name!", variable.getValue()));
+		}
+		SmartScriptToken from = lexer.nextToken();
+		SmartScriptToken to = lexer.nextToken();
+		SmartScriptToken counter = lexer.nextToken();
+		Element counterElem = null;
+		if (counter.getType() != SmartScriptTokenType.CLOSE_TAG) {
+			if (lexer.nextToken().getType() != SmartScriptTokenType.CLOSE_TAG) {
+				throw new SmartScriptParserException("FOR tag not written properly! Incorrect number of elements or closing bracket not provided!");
 			}
+			counterElem = getMatchingElementForTag(counter);
+		}
+		return new ForLoopNode(new ElementVariable(variable.getValue().toString()),
+				getMatchingElementForTag(from), getMatchingElementForTag(to), counterElem);
+		
+	}
+	
+	/**
+	 * Returns the matching element based on the type of a given {@code SmartScriptToken}.
+	 * It can only return elements that can be present in the {@code For TAG}, otherwise
+	 * {@code SmartScriptParserException} is thrown.
+	 * 
+	 * @param token
+	 *        {@code SmartScriptToken} used to create the matching element
+	 * @return the matching element based on the type of given {@code SmartScriptToken}
+	 * @throws SmartScriptParserException if the type of the given {@code SmartScriptToken}
+	 *         is not valid for {@code For TAG}
+	 */
+	private Element getMatchingElementForTag(SmartScriptToken token) {
+		switch (token.getType()) {
+		case VARIABLE:
+			return new ElementVariable(token.getValue().toString());
+		
+		case STRING:
+			return new ElementString(token.getValue().toString());
+			
+		case CONSTANT_DOUBLE:
+			return new ElementConstantDouble(Double.parseDouble(token.getValue().toString()));
+			
+		case CONSTANT_INTEGER:
+			return new ElementConstantInteger(Integer.parseInt(token.getValue().toString()));
+			
+		default:
+			throw new SmartScriptParserException("Invalid element type in FOR tag! Element: " + token.getValue());
 		}
 	}
 	
-	private Element getRightElement(Token element) {
-		if (element.getType() == TokenType.FUNCTION) {
-			return new ElementFunction(element.getValue().toString());
+	/**
+	 * Returns the matching element based on the type of a given {@code SmartScriptToken}.
+	 * It can only return elements that can be present in the {@code Echo TAG}, otherwise
+	 * {@code SmartScriptParserException} is thrown.
+	 * 
+	 * @param token
+	 *        {@code SmartScriptToken} used to create the matching element
+	 * @return the matching element based on the type of given {@code SmartScriptToken}
+	 * @throws SmartScriptParserException if the type of the given {@code SmartScriptToken}
+	 *         is not valid for {@code Echo TAG}
+	 */
+	private Element getMatchingElementEqualsTag(SmartScriptToken token) {
+		switch (token.getType()) {
+		case FUNCTION:
+			return new ElementFunction(token.getValue().toString());
+		
+		case SYMBOL:
+			if (!operators.contains(token.getValue())) {
+				throw new SmartScriptParserException("Unrecognized symbol: " + token.getValue());
+			}
+			return new ElementOperator(token.getValue().toString());
+			
+		default:
+			return getMatchingElementForTag(token);
 		}
-		if (element.getType() == TokenType.OPERATOR) {
-			return new ElementOperator(element.getValue().toString());
-		}
-		return checkVariableOrNumber(element);
 	}
 	
+	/**
+	 * Returns the root node of the created document tree.
+	 * 
+	 * @return the root node of the created document tree
+	 */
 	public DocumentNode getDocumentNode() {
 		return document;
 	}

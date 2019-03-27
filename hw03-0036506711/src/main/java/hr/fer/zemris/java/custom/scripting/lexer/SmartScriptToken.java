@@ -9,19 +9,19 @@ import java.util.Objects;
  * @author Filip Husnjak
  *
  */
-public class Token {
+public class SmartScriptToken {
 	
 	/**
 	 * Type of {@code this Token} specified by enumeration {@code TokenType}.
 	 */
-	private TokenType type;
+	private SmartScriptTokenType type;
 	
 	/**
 	 * Value of this {@code Token}.
 	 */
 	private Object value;
 	
-	public static final Token EOF_TOKEN = new Token(TokenType.EOF, null);
+	public static final SmartScriptToken EOF_TOKEN = new SmartScriptToken(SmartScriptTokenType.EOF, null);
 	
 	/**
 	 * Constructs a {@code Token} object with a given type and value.
@@ -31,7 +31,7 @@ public class Token {
 	 * @param value
 	 *        value of {@code this Token}
 	 */
-	public Token(TokenType type, Object value) {
+	public SmartScriptToken(SmartScriptTokenType type, Object value) {
 		Objects.requireNonNull(type, "Given type cannot be null!");
 		this.type = type;
 		this.value = value;
@@ -51,7 +51,7 @@ public class Token {
 	 * 
 	 * @return the type of {@code this Token} 
 	 */
-	public TokenType getType() {
+	public SmartScriptTokenType getType() {
 		return type;
 	}
 
@@ -66,9 +66,9 @@ public class Token {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Token))
+		if (!(obj instanceof SmartScriptToken))
 			return false;
-		Token other = (Token) obj;
+		SmartScriptToken other = (SmartScriptToken) obj;
 		return type == other.type && Objects.equals(value, other.value);
 	}
 	

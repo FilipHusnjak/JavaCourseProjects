@@ -134,6 +134,7 @@ public interface Collection {
 	 *        accordingly
 	 * @param tester
 	 *        functional interface that is used to test elements of the given {@code Collection}
+	 * @throws NullPointerException if given collection or tester is {@code null}
 	 */
 	default void addAllSatisfying(Collection col, Tester tester) {
 		Objects.requireNonNull(col, "Given collection cannot be null!");
