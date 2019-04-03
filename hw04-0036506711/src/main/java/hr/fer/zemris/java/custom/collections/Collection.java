@@ -7,7 +7,7 @@ import java.util.Objects;
  * 
  * @author Filip Husnjak
  */
-public interface Collection {
+public interface Collection<T> {
 
 	/**
 	 * Returns {@code true} if this collection contains no elements.
@@ -31,7 +31,7 @@ public interface Collection {
 	 * @param value
 	 *        object to be added into this collection
 	 */
-	void add(Object value);
+	void add(T value);
 	
 	/**
 	 * Returns {@code true} if this collection contains given value, 
@@ -60,7 +60,7 @@ public interface Collection {
 	 * 
 	 * @return array of elements in this collection
 	 */
-	Object[] toArray();
+	T[] toArray();
 	
 	/**
 	 * Performs the given action for each element of the {@code Collection}
@@ -70,7 +70,7 @@ public interface Collection {
 	 *        the action to be performed for each element
 	 * @throws NullPointerException if the given processor object is {@code null}
 	 */
-	default void forEach(Processor processor) {
+	default void forEach(Processor<? super T> processor) {
 		Objects.requireNonNull(processor, "Processor object cannot be null!");
 		createElementsGetter().processRemaining(processor);
 	}
@@ -82,8 +82,8 @@ public interface Collection {
 	 *        collection containing elements to be added into this collection
 	 * @throws NullPointerException if the given Collection is {@code null}
 	 */
-	default void addAll(Collection other) {
-		Objects.requireNonNull(other);
+	default void addAll(Collection<? extends T> other) {
+		Objects.requireNonNull(other, "Given collection cannot be null!");
 		other.forEach(this::add);
 	}
 	
@@ -99,7 +99,7 @@ public interface Collection {
 	 * 
 	 * @return ElementsGetter that represents an iterator over {@code this} Collection
 	 */
-	ElementsGetter createElementsGetter();
+	ElementsGetter<T> createElementsGetter();
 	
 	/**
 	 * Adds all elements, from the given collection, that satisfy the condition specified by {@code Tester} object.
@@ -114,7 +114,7 @@ public interface Collection {
 	 *        functional interface that is used to test elements of the given {@code Collection}
 	 * @throws NullPointerException if given collection or tester is {@code null}
 	 */
-	default void addAllSatisfying(Collection col, Tester tester) {
+	default void addAllSatisfying(Collection<? extends T> col, Tester<? super T> tester) {
 		Objects.requireNonNull(col, "Given collection cannot be null!");
 		Objects.requireNonNull(tester, "Given tester cannot be null!");
 		col.createElementsGetter().processRemaining(o -> {

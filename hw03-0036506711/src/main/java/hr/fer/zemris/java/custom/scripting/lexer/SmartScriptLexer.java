@@ -296,10 +296,13 @@ public class SmartScriptLexer {
 		}
 		boolean dot = false;
 		while (currentIndex < data.length && (Character.isDigit(data[currentIndex]) || (!dot && data[currentIndex] == '.'))) {
-			if (data[currentIndex] == '.') dot = true;
+			if (data[currentIndex] == '.') {
+				dot = true;
+				if (currentIndex == data.length - 1 || !Character.isDigit(data[currentIndex + 1])) break;
+			}
 			number.append(data[currentIndex++]);
 		}
-		String num = number.toString().replaceAll("\\.$", "");
+		String num = number.toString();
 		try {
 			return new SmartScriptToken(SmartScriptTokenType.CONSTANT_INTEGER, Integer.parseInt(num));
 		} catch (NumberFormatException ex1) {

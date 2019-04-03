@@ -10,29 +10,29 @@ import java.util.Objects;
  * 
  * @author Filip Husnjak
  */
-public class LinkedListIndexedCollection implements List {
+public class LinkedListIndexedCollection<T> implements List<T> {
 	
 	/**
 	 * Represents node in the linked list.
 	 * 
 	 * @author Filip Husnjak
 	 */
-	private static class ListNode {
+	private static class ListNode<E> {
 		
 		/**
 		 * next ListNode in linked list
 		 */
-		ListNode next;
+		ListNode<E> next;
 		
 		/**
 		 * previous ListNode in linked list
 		 */
-		ListNode prev;
+		ListNode<E> prev;
 		
 		/**
 		 * value of this ListNode
 		 */
-		private Object value;
+		private E value;
 		
 		/**
 		 * Assigns value of this ListNode to the specified value when
@@ -41,11 +41,11 @@ public class LinkedListIndexedCollection implements List {
 		 * @param value
 		 *        specified value of this object
 		 */
-		public ListNode(Object value) {
+		public ListNode(E value) {
 			this.value = value;
 		}
 		
-		public Object getValue() {
+		public E getValue() {
 			return value;
 		}
 	}
@@ -58,12 +58,12 @@ public class LinkedListIndexedCollection implements List {
 	/**
 	 * Reference to the first node in this linked list.
 	 */
-	private ListNode first;
+	private ListNode<T>first;
 	
 	/**
 	 * Reference to the last node in this linked list.
 	 */
-	private ListNode last;
+	private ListNode<T> last;
 	
 	/**
 	 * The number of times this {@code Collection} has been structurally modified.
@@ -86,7 +86,7 @@ public class LinkedListIndexedCollection implements List {
 	 *        the collection whose elements are to be placed into this collection
 	 * @throws NullPointerException if the given collection is {@code null}
 	 */
-	public LinkedListIndexedCollection(Collection other) {
+	public LinkedListIndexedCollection(Collection<T> other) {
 		Objects.requireNonNull(other, "Given collection cannot be null!");
 		addAll(other);
 	}
@@ -101,16 +101,16 @@ public class LinkedListIndexedCollection implements List {
 	 * @return node at specified index
 	 * @throws IndexOutOfBoundsException if index is out of range of {@code this Collection}
 	 */
-	private ListNode getNode(int index) {
+	private ListNode<T> getNode(int index) {
 		Objects.checkIndex(index, size);
 		// If index is less than {@code currentSize / 2} start from the beginning, otherwise start from the end.
 		if (index < (size >> 1)) {
-            ListNode node = first;
+            ListNode<T> node = first;
             for (int i = 0; i < index; i++)
                 node = node.next;
             return node;
         } else {
-            ListNode node = last;
+            ListNode<T> node = last;
             for (int i = size - 1; i > index; i--)
                 node = node.prev;
             return node;
@@ -124,11 +124,11 @@ public class LinkedListIndexedCollection implements List {
 	 * @param node
 	 * 		  node to be removed from this list
 	 */
-	private void removeNode(ListNode node) {
+	private void removeNode(ListNode<T> node) {
 		if (node == null) return;
 		
-		ListNode prev = node.prev;
-		ListNode next = node.next;
+		ListNode<T> prev = node.prev;
+		ListNode<T> next = node.next;
 		if (prev == null) {
 			first = next;
 		} else {
@@ -156,9 +156,9 @@ public class LinkedListIndexedCollection implements List {
 	 *        value of a new node
 	 * @throws NullPointerException if given {@code value} is {@code null}
 	 */
-	private void addBefore(ListNode node, Object value) {
+	private void addBefore(ListNode<T> node, T value) {
 		Objects.requireNonNull(value, "Given object cannot be null!");
-		ListNode newNode = new ListNode(value);
+		ListNode<T> newNode = new ListNode<>(value);
 		newNode.next = node;
 		if (node == null) {
 			if (last == null) {
@@ -196,7 +196,7 @@ public class LinkedListIndexedCollection implements List {
 	 * @throws NullPointerException if the given value is null
 	 */
 	@Override
-	public void add(Object value) {
+	public void add(T value) {
 		addBefore(null, value);
 	}
 	
@@ -206,7 +206,7 @@ public class LinkedListIndexedCollection implements List {
 	 * <br>{@code O(size/2+1)}.
 	 */
 	@Override
-	public Object get(int index) {
+	public T get(int index) {
 		return getNode(index).getValue();
 	}
 	
@@ -226,7 +226,7 @@ public class LinkedListIndexedCollection implements List {
 	 * <br>{@code O(size/2+1)}.
 	 */
 	@Override
-	public void insert(Object value, int position) {
+	public void insert(T value, int position) {
 		if (position == size) {
 			addBefore(null, value);
 		}
@@ -243,7 +243,7 @@ public class LinkedListIndexedCollection implements List {
 	@Override
 	public int indexOf(Object value) {
 		int index = 0;
-		for (ListNode node = first; node != null; node = node.next, index++) {
+		for (ListNode<T> node = first; node != null; node = node.next, index++) {
 			if (node.getValue().equals(value)) {
 				return index;
 			}
@@ -286,16 +286,16 @@ public class LinkedListIndexedCollection implements List {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object[] toArray() {
-		return new ArrayIndexedCollection(this).toArray();
+	public T[] toArray() {
+		return new ArrayIndexedCollection<>(this).toArray();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ElementsGetter createElementsGetter() {
-		return new LinkedListElementsGetter(this);
+	public ElementsGetter<T> createElementsGetter() {
+		return new LinkedListElementsGetter();
 	}
 	
 	/**
@@ -305,38 +305,18 @@ public class LinkedListIndexedCollection implements List {
 	 * 
 	 * @author Filip Husnjak
 	 */
-	private static class LinkedListElementsGetter implements ElementsGetter {
-
-		/**
-		 * Represents {@code Collection} for internal data storage.
-		 */
-		private final LinkedListIndexedCollection collection;
+	private class LinkedListElementsGetter implements ElementsGetter<T> {
 		
 		/**
 		 * Saved {@code modificationCount} of a given {@code Collection}, its immutable and initialized
 		 * upon object creation.
 		 */
-		private final long savedModification;
+		private final long savedModification = modificationCount;
 		
 		/**
 		 * 
 		 */
-		private ListNode nextNode;
-		
-		/**
-		 * Constructs an object with specified {@code Collection}. This instance of
-		 * {@code LinkedListElementsGetter} will iterate over the specified {@code Collection}.
-		 * 
-		 * @param collection
-		 *        collection you want to iterate over
-		 * @throws NullPointerException if the given {@code Collection} is {@code null}
-		 */
-		public LinkedListElementsGetter(LinkedListIndexedCollection collection) {
-			Objects.requireNonNull(collection, "Given collection cannot be null!");
-			savedModification = collection.modificationCount;
-			this.collection = collection;
-			this.nextNode = collection.first;
-		}
+		private ListNode<T> nextNode = first;
 		
 		/**
 		 * {@inheritDoc}
@@ -351,11 +331,11 @@ public class LinkedListIndexedCollection implements List {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object getNextElement() {
+		public T getNextElement() {
 			if (!hasNextElement()) {
 				throw new NoSuchElementException("This iteration contains no more elements!");
 			}
-			Object value = nextNode.value;
+			T value = nextNode.value;
 			nextNode = nextNode.next;
 			return value;
 		}
@@ -369,7 +349,7 @@ public class LinkedListIndexedCollection implements List {
 		 *         {@code collection.modificationCount} are not equal
 		 */
 		private void checkForModification() {
-			if (savedModification != collection.modificationCount) {
+			if (savedModification != modificationCount) {
 				throw new ConcurrentModificationException("The collection was modified after this iterator was created!");
 			}
 		}
