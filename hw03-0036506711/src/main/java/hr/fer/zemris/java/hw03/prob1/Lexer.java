@@ -13,7 +13,7 @@ import java.util.Objects;
 public class Lexer {
 	
 	/**
-	 * Given expression as char array.
+	 * Given expression as char array
 	 */
 	private char[] data;
 	

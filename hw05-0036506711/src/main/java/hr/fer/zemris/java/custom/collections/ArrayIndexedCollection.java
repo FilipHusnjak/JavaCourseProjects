@@ -124,7 +124,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	 * @throws NullPointerExceotion if the given collection is {@code null}
 	 */
 	private static int returnExpectedCapacity(Collection<?> other, int initialCapacity) {
-		other = Objects.requireNonNull(other, "Given Collection cannot be null!");
+		Objects.requireNonNull(other, "Given Collection cannot be null!");
 		return Math.max(other.size(), initialCapacity);
 	}
 	
@@ -137,7 +137,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	private T[] checkAndGrow() {
 		if (elements.length <= size) {
 			elements = Arrays.copyOf(elements, elements.length * CAPACITY_MULTIPLIER);
-		} 
+		}
 		return elements;
 	}
 	

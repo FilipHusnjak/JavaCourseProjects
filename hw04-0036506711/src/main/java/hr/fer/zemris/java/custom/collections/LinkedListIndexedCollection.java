@@ -22,12 +22,12 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 		/**
 		 * next ListNode in linked list
 		 */
-		ListNode<E> next;
+		private ListNode<E> next;
 		
 		/**
 		 * previous ListNode in linked list
 		 */
-		ListNode<E> prev;
+		private ListNode<E> prev;
 		
 		/**
 		 * value of this ListNode
@@ -86,7 +86,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 	 *        the collection whose elements are to be placed into this collection
 	 * @throws NullPointerException if the given collection is {@code null}
 	 */
-	public LinkedListIndexedCollection(Collection<T> other) {
+	public LinkedListIndexedCollection(Collection<? extends T> other) {
 		Objects.requireNonNull(other, "Given collection cannot be null!");
 		addAll(other);
 	}
@@ -286,7 +286,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public T[] toArray() {
+	public Object[] toArray() {
 		return new ArrayIndexedCollection<>(this).toArray();
 	}
 
