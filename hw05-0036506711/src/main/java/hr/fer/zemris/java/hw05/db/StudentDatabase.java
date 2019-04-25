@@ -1,6 +1,6 @@
 package hr.fer.zemris.java.hw05.db;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,11 +11,10 @@ import java.util.stream.Collectors;
  * and grade between 1 and 5.
  * 
  * @author Filip Husnjak
- *
  */
 public class StudentDatabase {
 	
-	private Map<String, StudentRecord> records = new HashMap<>();
+	private Map<String, StudentRecord> records = new LinkedHashMap<>();
 	
 	/**
 	 * Constructs {@code StudentDatabase} object from given lines. Each line should
@@ -32,7 +31,7 @@ public class StudentDatabase {
 	public StudentDatabase(List<String> lines) {
 		Objects.requireNonNull(lines, "Given list cannot be null!");
 		for (String line: lines) {
-			String[] parts = line.split("\\t+");
+			String[] parts = line.trim().split("\\t+");
 			if (parts.length != 4) {
 				throw new IllegalArgumentException("Wrong line format!");
 			}
@@ -76,7 +75,7 @@ public class StudentDatabase {
 	public List<StudentRecord> filter(IFilter filter) {
 		Objects.requireNonNull(filter, "Given filter cannot be null!");
 		return records.entrySet().stream().map(Map.Entry::getValue).filter(filter::accepts)
-						.sorted((v1, v2) -> v1.getJmbag().compareTo(v2.getJmbag())).collect(Collectors.toList());
+						.collect(Collectors.toList());
 	}
 	
 }

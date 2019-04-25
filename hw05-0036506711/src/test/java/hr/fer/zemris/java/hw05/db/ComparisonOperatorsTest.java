@@ -90,4 +90,22 @@ public class ComparisonOperatorsTest {
 		assertFalse(ComparisonOperators.LIKE.satisfied("AAAB", "AA*AAB"));
 	}
 	
+	@Test
+	public void testLikeMultipleWildcards() {
+		assertThrows(IllegalArgumentException.class, () -> ComparisonOperators.LIKE.satisfied("AAA", "AA*A*A"));
+		assertThrows(IllegalArgumentException.class, () -> ComparisonOperators.LIKE.satisfied("ABCC", "ABC*CC*"));
+		assertThrows(IllegalArgumentException.class, () -> ComparisonOperators.LIKE.satisfied("AAAB", "AA**AAB"));
+	}
+	
+	@Test
+	public void testLikeWithoutWildcards() {
+		assertFalse(ComparisonOperators.LIKE.satisfied("AAA", "AAAA"));
+		assertFalse(ComparisonOperators.LIKE.satisfied("ABCC", "ABC"));
+		assertFalse(ComparisonOperators.LIKE.satisfied("AAAB", "AAB"));
+		
+		assertTrue(ComparisonOperators.LIKE.satisfied("AAAA", "AAAA"));
+		assertTrue(ComparisonOperators.LIKE.satisfied("AABAA", "AABAA"));
+		assertTrue(ComparisonOperators.LIKE.satisfied("ABCDD", "ABCDD"));
+	}
+	
 }

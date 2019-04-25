@@ -54,6 +54,7 @@ public class StudentRecord {
 	 *        first name of the student
 	 * @param grade
 	 *        students grade
+	 * @throws NullPointerException if any of the given arguments is {@code null}
 	 */
 	public StudentRecord(String jmbag, String lastName, String firstName, int grade) {
 		this.jmbag = Objects.requireNonNull(jmbag, "Given jmbag cannot be null!");

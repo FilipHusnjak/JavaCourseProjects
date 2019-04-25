@@ -50,7 +50,13 @@ public class ComparisonOperators {
 		for (i = 0; i < v2.length() && v2.charAt(i) != '*'; ++i) {
 			start.append(v2.charAt(i));
 		}
+		if (i == v2.length()) {
+			return v1.equals(start.toString());
+		}
 		for (i = i + 1; i < v2.length(); ++i) {
+			if (v2.charAt(i) == '*') {
+				throw new IllegalArgumentException("More than one wildcards used!");
+			}
 			end.append(v2.charAt(i));
 		}
 		int size = start.length() + end.length();

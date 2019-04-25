@@ -24,12 +24,12 @@ public class QueryParser {
 	private QueryLexer lexer;
 	
 	/**
-	 * Maps IFieldValueGetter implementations to attribute names
+	 * Maps IFieldValueGetter implementations with attribute names
 	 */
 	private static Map<String, IFieldValueGetter> attributeNames = new HashMap<>();
 	
 	/**
-	 * Maps IComparisonOperators to their String representation
+	 * Maps IComparisonOperators with their String representation
 	 */
 	private static Map<String, IComparisonOperator> operators = new HashMap<>();
 	

@@ -20,7 +20,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>hr.fer.zemris.java.lsystems</groupId>
+			<groupId>lsystems</groupId>
 			<artifactId>lsystems</artifactId>
       		<version>1</version>
 		</dependency>

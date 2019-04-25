@@ -21,14 +21,11 @@ public class StudentDB {
 	 * Loads the database from ./src/main/resources/database.txt and performs given
 	 * queries. Queries are given through console until "exit" is sent. The results
 	 * will be present immediately sorted by JMBAG.
-	 * 
-	 * @throws IOException if the database cannot be opened of found
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		try {
 			StudentDatabase database = new StudentDatabase(
 					Files.readAllLines(Paths.get("./src/main/resources/database.txt"), StandardCharsets.UTF_8));
-			
 			Scanner sc = new Scanner(System.in);
 			System.out.print("> ");
 			while (sc.hasNext()) {
@@ -36,7 +33,7 @@ public class StudentDB {
 				if (line.equals("exit")) break;
 				try {
 					if (!line.trim().split(" ", 2)[0].trim().equals("query")) {
-						System.out.println("Query have to start with query keyword!");
+						System.out.println("Query has to start with query keyword!");
 						System.out.print("\n> ");
 						continue;
 					}
@@ -47,7 +44,7 @@ public class StudentDB {
 					} else {
 						formatQueriedResults(database.filter(new QueryFilter(parser.getQuery()))).forEach(System.out::println);
 					}
-				} catch (QueryParserException e) {
+				} catch (QueryParserException | IllegalArgumentException e) {
 					System.out.println(e.getMessage());
 				}
 				System.out.print("\n> ");
@@ -57,6 +54,8 @@ public class StudentDB {
 			
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			System.out.println("Text file cannot be read or opened!");
 		}
 	}
 	

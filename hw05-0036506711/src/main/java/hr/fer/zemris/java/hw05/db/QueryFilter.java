@@ -32,6 +32,7 @@ public class QueryFilter implements IFilter {
 	 * Returns {@code true} if Every condition in list {@link #expressions} is satisfied.
 	 * 
 	 * @return {@code true} if Every condition in list {@link #expressions} is satisfied
+	 * @throws NullPointerException if the given record is {@code null}
 	 */
 	@Override
 	public boolean accepts(StudentRecord record) {

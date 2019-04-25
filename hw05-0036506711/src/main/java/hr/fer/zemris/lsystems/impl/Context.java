@@ -39,8 +39,7 @@ public class Context {
 	 * @throws NullPointerException if the given state is {@code null}
 	 */
 	public void pushState(TurtleState state) {
-		Objects.requireNonNull(state, "Given state cannot be null!");
-		states.push(state);
+		states.push(Objects.requireNonNull(state, "Given state cannot be null!"));
 	}
 	
 	/**

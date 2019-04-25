@@ -136,8 +136,8 @@ public class LSystemBuilderImpl implements LSystemBuilder {
 			if (parts.length < 2) throw new IllegalArgumentException("Missing specified unitLengthDegreeScaler value!");
 			try {
 				String[] fraction = String.join("", Arrays.copyOfRange(parts, 1, parts.length)).split("/");
-				if (fraction.length != 2) throw new IllegalArgumentException("Fraction not given!");
-				setUnitLengthDegreeScaler(Double.parseDouble(fraction[0]) / Double.parseDouble(fraction[1]));
+				if (fraction.length != 2 && fraction.length != 1) throw new IllegalArgumentException("Fraction or decimal number not given!");
+				setUnitLengthDegreeScaler(Double.parseDouble(fraction[0]) / (fraction.length == 2 ? Double.parseDouble(fraction[1]) : 1.0d));
 			} catch (NumberFormatException e) {
 				throw new IllegalArgumentException("Fraction does not contain real numbers!");
 			}
@@ -166,9 +166,9 @@ public class LSystemBuilderImpl implements LSystemBuilder {
 	public LSystemBuilder configureFromText(String[] lines) {
 		Objects.requireNonNull(lines, "Given array cannot be null!");
 		for (int i = 0; i < lines.length; ++i) {
-			String[] parts = lines[i].split("\\s+");
+			String[] parts = lines[i].trim().split("\\s+");
 			if (parts.length <= 0 || parts[0].isEmpty()) continue;
-			setupMap.getOrDefault(parts[0], p -> {}).setup(parts);
+			setupMap.getOrDefault(parts[0], p -> { throw new IllegalArgumentException("Unrecognized parameter: " + parts[0]); }).setup(parts);
 		}
 		return this;
 	}
@@ -178,10 +178,14 @@ public class LSystemBuilderImpl implements LSystemBuilder {
 	 * which is added to command list.
 	 * 
 	 * @return {@code this} instance of {@code LSystemBuilder} class
-	 * @throws IllegalArgumentException if the given action cannot be parsed
+	 * @throws IllegalArgumentException if the given action cannot be parsed or if the
+	 *         command for the given symbol is already defined
 	 */
 	@Override
 	public LSystemBuilder registerCommand(char symbol, String action) {
+		if (regCommands.get(symbol) != null) {
+			throw new IllegalArgumentException("Multiple commands for the same symbol defined!");
+		}
 		String[] parts = Objects.requireNonNull(action, "Given action cannot be null!").split("\\s+");
 		try {
 			switch (parts[0]) {
@@ -211,40 +215,95 @@ public class LSystemBuilderImpl implements LSystemBuilder {
 			}
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Number expected but not given: " + parts[1]);
+		} catch (IndexOutOfBoundsException e) {
+			throw new IllegalArgumentException("Missing arguments for the " + parts[0] + " command!");
 		}
 		return this;
 	}
 
+	/**
+	 * Adds new production to {@link #regProductions} defined with given symbol and
+	 * String.
+	 * 
+	 * @param symbol
+	 *        symbol whose production is to be registered
+	 * @param production
+	 *        specified production of a symbol
+	 * @return {@code this} LSystemBuilder instance
+	 * @throws NullPointerException if the given production is {@code null}
+	 * @throws IllegalArgumentException if the production for the symbol already exists
+	 */
 	@Override
 	public LSystemBuilder registerProduction(char symbol, String production) {
+		if (regProductions.get(symbol) != null) {
+			throw new IllegalArgumentException("Multiple productions for the same symbol defined!");
+		}
 		regProductions.put(symbol, Objects.requireNonNull(production, "Given production cannot be null!"));
 		return this;
 	}
 
+	/**
+	 * Sets the initial angle to the given one.
+	 * 
+	 * @param angle
+	 *        initial angle
+	 * @return {@code this} LSystemBuilder instance
+	 */
 	@Override
 	public LSystemBuilder setAngle(double angle) {
 		this.angle = angle;
 		return this;
 	}
 
+	/**
+	 * Sets the initial sequence of characters to the given one.
+	 * 
+	 * @param axiom
+	 *        initial sequence of characters
+	 * @return {@code this} LSystemBuilder instance
+	 * @throws NullPointerException if the given axiom is {@code null}
+	 */
 	@Override
 	public LSystemBuilder setAxiom(String axiom) {
 		this.axiom = Objects.requireNonNull(axiom, "Given axiom cannot be null!");
 		return this;
 	}
 
+	/**
+	 * Sets the origin to the given one.
+	 * 
+	 * @param x
+	 *        x value of the origin vector
+	 * @param y
+	 *        y value of the origin vector
+	 * @return {@code this} LSystemBuilder instance
+	 */
 	@Override
 	public LSystemBuilder setOrigin(double x, double y) {
 		origin = new Vector2D(x, y);
 		return this;
 	}
 
+	/**
+	 * Sets the unitLength to the given one.
+	 * 
+	 * @param unitLength
+	 *        unitLength of the translation
+	 * @return {@code this} LSystemBuilder instance
+	 */
 	@Override
 	public LSystemBuilder setUnitLength(double unitLength) {
 		this.unitLength = unitLength;
 		return this;
 	}
 
+	/**
+	 * Sets the unitLengthDegreeScaler to the given one.
+	 * 
+	 * @param unitLengthDegreeScaler
+	 *        unitLengthDegreeScaler used when drawing different levels
+	 * @return {@code this} LSystemBuilder instance
+	 */
 	@Override
 	public LSystemBuilder setUnitLengthDegreeScaler(double unitLengthDegreeScaler) {
 		this.unitLengthDegreeScaler = unitLengthDegreeScaler;
@@ -270,7 +329,7 @@ public class LSystemBuilderImpl implements LSystemBuilder {
 		@Override
 		public void draw(int level, Painter painter) {
 			Context context = new Context();
-			context.pushState(new TurtleState(origin.copy(), Vector2D.UNIT_VEC.rotated(angle), Color.BLACK, unitLength));
+			context.pushState(new TurtleState(origin.copy(), Vector2D.UNIT_VEC.rotated(angle / 180 * Math.PI), Color.BLACK, unitLength));
 			new ScaleCommand(Math.pow(unitLengthDegreeScaler, level)).execute(context, painter);
 			String sequence = generate(level);
 			for (int i = 0; i < sequence.length(); ++i) {
