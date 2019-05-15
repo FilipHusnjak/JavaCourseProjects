@@ -1,4 +1,4 @@
-package hr.fer.zemris.java.gui.calc.model;
+package hr.fer.zemris.java.gui.calc;
 
 import java.awt.Container;
 import java.util.ArrayDeque;
@@ -9,6 +9,9 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import hr.fer.zemris.java.gui.calc.model.CalcModel;
+import hr.fer.zemris.java.gui.calc.model.CalcModelImpl;
+import hr.fer.zemris.java.gui.calc.model.CalculatorInputException;
 import hr.fer.zemris.java.gui.calc.model.buttons.BinaryOperationButton;
 import hr.fer.zemris.java.gui.calc.model.buttons.ButtonProperties;
 import hr.fer.zemris.java.gui.calc.model.buttons.CalcButton;
@@ -127,7 +130,6 @@ public class Calculator extends JFrame {
 			stack.clear();
 		});
 		
-		
 		PowerOperationButton powerOperationBtn = new PowerOperationButton(model);
 		
 		JCheckBox inverseCB = new JCheckBox("inv");
@@ -135,11 +137,14 @@ public class Calculator extends JFrame {
 			for (UnaryOperationButton button: unaryOperationBtns) {
 				if (inverseCB.isSelected()) {
 					button.setInverse();
-					powerOperationBtn.setInverse();
 				} else {
 					button.setNormal();
-					powerOperationBtn.setNormal();
 				}
+			}
+			if (inverseCB.isSelected()) {
+				powerOperationBtn.setInverse();
+			} else {
+				powerOperationBtn.setNormal();
 			}
 		});
 		inverseCB.setFont(inverseCB.getFont().deriveFont(ButtonProperties.buttonFont));

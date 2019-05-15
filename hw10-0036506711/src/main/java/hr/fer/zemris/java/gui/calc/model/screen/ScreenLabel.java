@@ -7,7 +7,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import hr.fer.zemris.java.gui.calc.model.Calculator;
 import hr.fer.zemris.java.gui.calc.model.buttons.ButtonProperties;
 
 /**
