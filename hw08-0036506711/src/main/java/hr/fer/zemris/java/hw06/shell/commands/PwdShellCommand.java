@@ -9,6 +9,13 @@ import hr.fer.zemris.java.hw06.shell.Environment;
 import hr.fer.zemris.java.hw06.shell.ShellCommand;
 import hr.fer.zemris.java.hw06.shell.ShellStatus;
 
+/**
+ * Implementation of interface {@code ShellCommand}.<br>
+ * Writes current directory to the console.<br>
+ * Takes no arguments.<br>
+ * 
+ * @author Filip Husnjak
+ */
 public class PwdShellCommand implements ShellCommand {
 	
 	/**
@@ -16,6 +23,10 @@ public class PwdShellCommand implements ShellCommand {
 	 */
 	private static final String NAME = "pwd";
 
+	/**
+	 * {@inheritDoc}
+	 * @throws NullPointerException if the given Environment or String object is {@code null}
+	 */
 	@Override
 	public ShellStatus executeCommand(Environment env, String arguments) {
 		Objects.requireNonNull(env, "Given environment cannot be null!");
@@ -28,11 +39,17 @@ public class PwdShellCommand implements ShellCommand {
 		return ShellStatus.CONTINUE;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getCommandName() {
 		return NAME;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<String> getCommandDescription() {
 		return Collections.unmodifiableList(Arrays.asList(

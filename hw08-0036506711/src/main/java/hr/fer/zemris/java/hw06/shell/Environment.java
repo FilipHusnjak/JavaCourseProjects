@@ -94,12 +94,45 @@ public interface Environment {
 	 */
 	void setMorelinesSymbol(Character symbol);
 	
+	/**
+	 * Returns absolute path to the current directory of the shell.
+	 * 
+	 * @return absolute path to the current directory of the shell.
+	 */
 	Path getCurrentDirectory();
 	
+	/**
+	 * Sets current directory to the specified one. If the given directory
+	 * does not exist or is {@code null} exception is thrown.
+	 * 
+	 * @param path
+	 *        new current directory
+	 * @throws NullPointerException if the given directory is {@code null}
+	 * @throws IllegalArgumentException if the given directory does not exist
+	 */
 	void setCurrentDirectory(Path path);
 	
+	/**
+	 * Returns shared data mapped to the specified key. If the given key does not
+	 * exist {@code null} is returned.
+	 * 
+	 * @param key
+	 *        key which value is to be returned
+	 * @return shared data mapped to the specified key. If the given key does not
+	 *         exist {@code null} is returned
+	 */
 	Object getSharedData(String key);
 	
+	/**
+	 * Maps the given value to the specified key in shared data map. Null values
+	 * for the key or value are forbidden.
+	 * 
+	 * @param key
+	 *        key to mapped
+	 * @param value
+	 *        value to be mapped
+	 * @throws NullPointerException if the given key or value are {@code null}
+	 */
 	void setSharedData(String key, Object value);
 	
 }

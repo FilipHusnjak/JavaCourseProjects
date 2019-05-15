@@ -1,6 +1,8 @@
 package hr.fer.zemris.java.hw06.shell.commands;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
@@ -9,6 +11,13 @@ import hr.fer.zemris.java.hw06.shell.Environment;
 import hr.fer.zemris.java.hw06.shell.ShellCommand;
 import hr.fer.zemris.java.hw06.shell.ShellStatus;
 
+/**
+ * Implementation of interface {@code ShellCommand}.<br>
+ * Pops the path from the internal stack and sets it as a current directory.<br>
+ * Takes no arguments.
+ * 
+ * @author Filip Husnjak
+ */
 public class PopdShellCommand implements ShellCommand {
 
 	/**
@@ -16,6 +25,10 @@ public class PopdShellCommand implements ShellCommand {
 	 */
 	private static final String NAME = "popd";
 	
+	/**
+	 * {@inheritDoc}
+	 * @throws NullPointerException if the given Environment or String object is {@code null}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public ShellStatus executeCommand(Environment env, String arguments) {
@@ -38,15 +51,23 @@ public class PopdShellCommand implements ShellCommand {
 		return ShellStatus.CONTINUE;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getCommandName() {
 		return NAME;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<String> getCommandDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableList(Arrays.asList(
+				"| Usage: popd",
+				"| Pops the path from the internal stack and sets it as current directory.",
+				"| Takes no arguments.\n"));
 	}
 	
 }

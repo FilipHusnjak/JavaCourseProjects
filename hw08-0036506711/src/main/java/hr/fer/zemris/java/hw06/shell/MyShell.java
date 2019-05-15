@@ -252,27 +252,41 @@ public class MyShell implements Environment {
 		moreLinesSymbol = Objects.requireNonNull(symbol, "Given symbol cannot be null!");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Path getCurrentDirectory() {
 		return currentDirectory.toAbsolutePath().normalize();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setCurrentDirectory(Path path) {
-		if (!Files.exists(path) || !Files.isDirectory(path)) {
+		if (!Files.exists(Objects.requireNonNull(path, "Given directory cannot be null!")) 
+				|| !Files.isDirectory(path)) {
 			throw new IllegalArgumentException("Given path does not exist or is not a directory!");
 		}
 		currentDirectory = path.toAbsolutePath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Object getSharedData(String key) {
 		return sharedData.get(key);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setSharedData(String key, Object value) {
-		sharedData.put(key, value);
+		sharedData.put(Objects.requireNonNull(key, "Given key cannot be null!"), 
+				Objects.requireNonNull(value, "Given value cannot be null!"));
 	}
 	
 }

@@ -10,6 +10,13 @@ import hr.fer.zemris.java.hw06.shell.ShellCommand;
 import hr.fer.zemris.java.hw06.shell.ShellStatus;
 import hr.fer.zemris.java.hw06.shell.util.ShellUtil;
 
+/**
+ * Implementation of interface {@code ShellCommand}.<br>
+ * Changes current directory to the specified one.<br>
+ * Takes one argument that represents new current directory.<br>
+ * 
+ * @author Filip Husnjak
+ */
 public class CdShellCommand implements ShellCommand {
 
 	/**
@@ -17,6 +24,10 @@ public class CdShellCommand implements ShellCommand {
 	 */
 	private static final String NAME = "cd";
 	
+	/**
+	 * {@inheritDoc}
+	 * @throws NullPointerException if the given Environment or String object are {@code null}
+	 */
 	@Override
 	public ShellStatus executeCommand(Environment env, String arguments) {
 		Objects.requireNonNull(env, "Given environment cannot be null!");
@@ -40,11 +51,17 @@ public class CdShellCommand implements ShellCommand {
 		return ShellStatus.CONTINUE;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getCommandName() {
 		return NAME;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<String> getCommandDescription() {
 		return Collections.unmodifiableList(Arrays.asList(

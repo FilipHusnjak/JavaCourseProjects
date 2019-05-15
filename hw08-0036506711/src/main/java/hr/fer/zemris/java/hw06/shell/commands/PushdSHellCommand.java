@@ -13,6 +13,14 @@ import hr.fer.zemris.java.hw06.shell.ShellCommand;
 import hr.fer.zemris.java.hw06.shell.ShellStatus;
 import hr.fer.zemris.java.hw06.shell.util.ShellUtil;
 
+/**
+ * Implementation of interface {@code ShellCommand}.<br>
+ * Pushes the current directory onto the internal stack and changes current directory
+ * to the given one.<br>
+ * Takes single argument which represents directory path.
+ * 
+ * @author Filip Husnjak
+ */
 public class PushdSHellCommand implements ShellCommand {
 	
 	/**
@@ -20,6 +28,10 @@ public class PushdSHellCommand implements ShellCommand {
 	 */
 	private static final String NAME = "pushd";
 
+	/**
+	 * {@inheritDoc}
+	 * @throws NullPointerException if the given Environment or String object is {@code null}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public ShellStatus executeCommand(Environment env, String arguments) {
@@ -50,11 +62,17 @@ public class PushdSHellCommand implements ShellCommand {
 		return ShellStatus.CONTINUE;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getCommandName() {
 		return NAME;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<String> getCommandDescription() {
 		return Collections.unmodifiableList(Arrays.asList(
