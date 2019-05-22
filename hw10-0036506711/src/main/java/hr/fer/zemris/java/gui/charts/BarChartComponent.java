@@ -118,7 +118,7 @@ public class BarChartComponent extends JComponent {
 		int n = (chart.getyMax() - chart.getyMin()) / chart.getyRes();
 		int heightWidth = coordinateYSize / n;
 		for (int i = 0; i <= n; ++i) {
-			g2.drawString(Integer.toString(i * chart.getyRes()), zeroX - metrics.stringWidth(Integer.toString(i * chart.getyRes())) - 2 * EXTRA, 
+			g2.drawString(Integer.toString(i * chart.getyRes() + chart.getyMin()), zeroX - metrics.stringWidth(Integer.toString(i * chart.getyRes() + chart.getyMin())) - 2 * EXTRA, 
 					zeroY - i * heightWidth + metrics.getHeight() / 4);
 		}
 		
