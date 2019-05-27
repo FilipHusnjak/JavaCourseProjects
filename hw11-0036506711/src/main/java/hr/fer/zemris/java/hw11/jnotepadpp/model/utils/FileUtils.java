@@ -1,4 +1,4 @@
-package hr.fer.zemris.java.hw11.jnotepadpp.utils;
+package hr.fer.zemris.java.hw11.jnotepadpp.model.utils;
 
 import java.awt.Component;
 

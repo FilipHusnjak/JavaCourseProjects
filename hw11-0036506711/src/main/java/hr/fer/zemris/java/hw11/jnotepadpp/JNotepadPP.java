@@ -35,7 +35,6 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Caret;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -51,7 +50,7 @@ import hr.fer.zemris.java.hw11.jnotepadpp.model.MultipleDocumentListener;
 import hr.fer.zemris.java.hw11.jnotepadpp.model.MultipleDocumentModel;
 import hr.fer.zemris.java.hw11.jnotepadpp.model.SingleDocumentListener;
 import hr.fer.zemris.java.hw11.jnotepadpp.model.SingleDocumentModel;
-import hr.fer.zemris.java.hw11.jnotepadpp.utils.FileUtils;
+import hr.fer.zemris.java.hw11.jnotepadpp.model.utils.FileUtils;
 
 /**
  * Represents application for editing and creating text files.
@@ -100,31 +99,18 @@ public class JNotepadPP extends JFrame {
 	private JLabel selectionLabel = new JLabel("-");
 	
 	/**
-	 * Menu item used for upper case action.
-	 */
-	private JMenuItem toUpperCase;
-	
-	/**
-	 * Menu item used for lower case action.
-	 */
-	private JMenuItem toLowerCase;
-	
-	/**
-	 * Menu item used for invert case action.
-	 */
-	private JMenuItem invertCase;
-	
-	/**
 	 * Collator used for locale-sensitive string comparison.
 	 */
 	private Collator collator;
+	
+	private volatile boolean running = true;
 	
 	/**
 	 * Constructs new {@link JNotepadPP}, initializes GUI and sets appropriate
 	 * listeners.
 	 */
 	public JNotepadPP() {
-		setupCollator();
+		setCollator();
 		addLocalizationListener();
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle(APP_NAME);
@@ -141,7 +127,7 @@ public class JNotepadPP extends JFrame {
 		flp.addLocalizationListener(() -> {
 			setOptionPaneLanguage();
 			setFileChooserLanguage();
-			setupCollator();
+			setCollator();
 		});
 	}
 	
@@ -170,7 +156,7 @@ public class JNotepadPP extends JFrame {
 	/**
 	 * Sets collator to use current language for string comparison.
 	 */
-	private void setupCollator() {
+	private void setCollator() {
 		Locale locale = new Locale(
 				LocalizationProvider.getInstance().getCurrentLanguage());
 		collator = Collator.getInstance(locale);
@@ -184,7 +170,7 @@ public class JNotepadPP extends JFrame {
 		Container cp = getContentPane();
 		cp.setLayout(new BorderLayout());
 		cp.add(model, BorderLayout.CENTER);
-		addListener();
+		addDocChangeListener();
 		createActions();
 		createMenubar();
 		cp.add(createToolbar(), BorderLayout.NORTH);
@@ -194,7 +180,7 @@ public class JNotepadPP extends JFrame {
 	/**
 	 * Adds listener to observe changes upon {@link JNotepadPP#model}.
 	 */
-	private void addListener() {
+	private void addDocChangeListener() {
 		model.addMultipleDocumentListener(docChangedListener);
 	}
 
@@ -209,6 +195,7 @@ public class JNotepadPP extends JFrame {
 		setAction(copyAction, "control C", KeyEvent.VK_C, false);
 		setAction(cutAction, "control X", KeyEvent.VK_T, false);
 		setAction(pasteAction, "control V", KeyEvent.VK_P, false);
+		setAction(statisticsAction, "control alt T", KeyEvent.VK_C, false);
 		setAction(closeTabAction, "control W", KeyEvent.VK_E, false);
 		setAction(exitAction, "control Q", KeyEvent.VK_X, true);
 		setAction(toUpperCaseAction, "control U", KeyEvent.VK_U, false);
@@ -247,11 +234,13 @@ public class JNotepadPP extends JFrame {
 		JMenuItem openFile = new JMenuItem(openFileAction);
 		JMenuItem saveFile = new JMenuItem(saveFileAction);
 		JMenuItem saveAsFile = new JMenuItem(saveAsFileAction);
+		JMenuItem statistics = new JMenuItem(statisticsAction);
 		JMenuItem exit = new JMenuItem(exitAction);
 		file.add(newFile);
 		file.add(openFile);
 		file.add(saveFile);
 		file.add(saveAsFile);
+		file.add(statistics);
 		file.addSeparator();
 		file.add(exit);
 		
@@ -275,9 +264,9 @@ public class JNotepadPP extends JFrame {
 		JMenu tools = new LocalizableMenu("tools", flp);
 		
 		JMenu changeCase = new LocalizableMenu("changeCase", flp);
-		toUpperCase = new JMenuItem(toUpperCaseAction);
-		toLowerCase = new JMenuItem(toLowerCaseAction);
-		invertCase = new JMenuItem(invertCaseAction);
+		JMenuItem toUpperCase = new JMenuItem(toUpperCaseAction);
+		JMenuItem toLowerCase = new JMenuItem(toLowerCaseAction);
+		JMenuItem invertCase = new JMenuItem(invertCaseAction);
 		changeCase.add(toUpperCase);
 		changeCase.add(toLowerCase);
 		changeCase.add(invertCase);
@@ -315,6 +304,7 @@ public class JNotepadPP extends JFrame {
 		toolbar.add(copyAction);
 		toolbar.add(cutAction);
 		toolbar.add(pasteAction);
+		toolbar.add(statisticsAction);
 		toolbar.addSeparator();
 		toolbar.add(closeTabAction);
 		toolbar.add(exitAction);
@@ -373,6 +363,9 @@ public class JNotepadPP extends JFrame {
 					DateTimeFormatter.ofPattern("YYYY/MM/dd HH:mm:ss");
 			@Override
 			public void run() {
+				// If window is closed do not update swing GUI
+				// because it will prevent application from exiting.
+				if (!running) return;
 				time.setText(formatter.format(LocalDateTime.now()));
 			}
 		};
@@ -403,11 +396,16 @@ public class JNotepadPP extends JFrame {
 			enableSelectionActions(false);
 			resetStats();
 		}
-		closeTabAction.setEnabled(currentModel != null);
-		saveAsFileAction.setEnabled(currentModel != null);
-		pasteAction.setEnabled(currentModel != null);
+		enableDocumentActions(currentModel != null);
 	}
 	
+	private void enableDocumentActions(boolean enable) {
+		closeTabAction.setEnabled(enable);
+		saveAsFileAction.setEnabled(enable);
+		pasteAction.setEnabled(enable);
+		statisticsAction.setEnabled(enable);
+	}
+
 	/**
 	 * Updates status bar using information retrieved from given current
 	 * document.
@@ -420,9 +418,8 @@ public class JNotepadPP extends JFrame {
 		lengthLabel.setText(String.valueOf(
 				textComponent.getText().length()));
 		
-		Caret caret = textComponent.getCaret();
-		int p0 = Math.min(caret.getDot(), caret.getMark());
-        int p1 = Math.max(caret.getDot(), caret.getMark());
+		int p0 = textComponent.getSelectionStart();
+        int p1 = textComponent.getSelectionEnd();
 		enableSelectionActions(p0 != p1);
 		Pair lineCol = getLineColumnNum(textComponent);
 		lineLabel.setText(String.valueOf(lineCol.x1 + 1));
@@ -552,6 +549,7 @@ public class JNotepadPP extends JFrame {
     				saveFile(document.getFilePath() == null, document);
     			}
     		}
+    		running = false;
     		dispose();
     	}
 	};
@@ -694,6 +692,31 @@ public class JNotepadPP extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			LocalizationProvider.getInstance().setLanguage("de");
+		}
+	};
+	
+	/**
+	 * Action used for showing statistical information.
+	 */
+	private final Action statisticsAction = new LocalizableAction("statistics", flp) {
+		private static final long serialVersionUID = -2320654903477302660L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextComponent textComponent = model.getCurrentDocument().getTextComponent();
+			String text = textComponent.getText();
+			int numberOfChar = text.length();
+			int numberOfNonBlankChar = text.replaceAll("\\s+", "").length();
+			int numberOfLines = text.split("\n").length;
+			String message = flp.getString("numberOfChar") + numberOfChar + "\n" +
+					flp.getString("numberOfNonBlankChar") + numberOfNonBlankChar + "\n" +
+					flp.getString("numberOfLines") + numberOfLines;
+			FileUtils.showDialog(
+					JNotepadPP.this, 
+					message, 
+					flp.getString("statistics"),
+					JOptionPane.DEFAULT_OPTION, 
+					JOptionPane.INFORMATION_MESSAGE);
 		}
 	};
 	

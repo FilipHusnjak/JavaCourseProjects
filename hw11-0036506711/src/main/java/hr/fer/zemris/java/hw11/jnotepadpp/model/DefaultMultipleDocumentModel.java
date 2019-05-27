@@ -22,7 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import hr.fer.zemris.java.hw11.jnotepadpp.local.LocalizationProvider;
-import hr.fer.zemris.java.hw11.jnotepadpp.utils.FileUtils;
+import hr.fer.zemris.java.hw11.jnotepadpp.model.utils.FileUtils;
 
 /**
  * Implementation of {@link MultipleDocumentModel} used for implementing
@@ -55,9 +55,27 @@ public class DefaultMultipleDocumentModel extends JTabbedPane implements Multipl
 	private SingleDocumentModel currentModel;
 	
 	/**
+	 * Icon that indicates modified document.
+	 */
+	private ImageIcon redDiskIcon;
+	
+	/**
+	 * Icon that indicates saved document.
+	 */
+	private ImageIcon greenDiskIcon;
+	
+	/**
+	 * Icon used for close button.
+	 */
+	private ImageIcon closeIcon;
+	
+	/**
 	 * Constructs new {@link MultipleDocumentModel} and adds appropriate listener.
 	 */
 	public DefaultMultipleDocumentModel() {
+		redDiskIcon = loadIcon("redDisk");
+		greenDiskIcon = loadIcon("greenDisk");
+		closeIcon = loadIcon("close");
 		addTabChangeListener();
 	}
 	
@@ -212,7 +230,7 @@ public class DefaultMultipleDocumentModel extends JTabbedPane implements Multipl
 				e -> notifyListeners(l -> l.wantCLoseDocument(model)));
 		rightButton.setOpaque(false);
 		rightButton.setMargin(new Insets(0, 0, 0, 0));
-		rightButton.setIcon(loadIcon("close"));
+		rightButton.setIcon(closeIcon);
 		rightButton.setBorder(null);
 		
 		panel.add(leftLabel);
@@ -237,7 +255,7 @@ public class DefaultMultipleDocumentModel extends JTabbedPane implements Multipl
 		addTab("", new JScrollPane(model.getTextComponent()));
 		setTabComponentAt(getTabCount() - 1, createTab(model));
 		setTitleAt(getTabCount() - 1, path);
-		setIconAt(getTabCount() - 1, loadIcon("greenDisk"));
+		setIconAt(getTabCount() - 1, greenDiskIcon);
 		notifyListeners(l -> l.documentAdded(model));
 		setSelectedIndex(getTabCount() - 1);
 		return model;
@@ -310,7 +328,7 @@ public class DefaultMultipleDocumentModel extends JTabbedPane implements Multipl
 	private SingleDocumentListener listener = new SingleDocumentListener() {
 		@Override
 		public void documentModifyStatusUpdated(SingleDocumentModel model) {
-			ImageIcon icon = loadIcon(model.isModified() ? "redDisk" : "greenDisk");
+			ImageIcon icon = model.isModified() ? redDiskIcon : greenDiskIcon;
 			setIconAt(getSelectedIndex(), icon);
 		}
 		
