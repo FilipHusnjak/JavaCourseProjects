@@ -1,0 +1,14 @@
+{$= "text/html" @setMimeType $}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Color Update</title>
+		<style>
+			body {background-color: #{$= "bgcolor" "7F7F7F" @pparamGet $};}
+ 		</style>
+	</head>
+	<body>
+		<h1>{$= "message" "" @tparamGet $}</a></h1>
+		<h1><a href="/index2.html">Home</a></h1>
+ 	</body>
+</html>
