@@ -7,7 +7,7 @@ package hr.fer.zemris.java.custom.scripting.lexer;
  */
 public class SmartScriptLexerException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 5936656131853783560L;
 
 	/**
 	 * Constructs an {@code LexerException} without additional message.

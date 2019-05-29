@@ -3,6 +3,12 @@ package hr.fer.zemris.java.webserver.workers;
 import hr.fer.zemris.java.webserver.IWebWorker;
 import hr.fer.zemris.java.webserver.RequestContext;
 
+/**
+ * Web worker which changes the background color of the home page and generate
+ * appropriate message.
+ * 
+ * @author Filip Husnjak
+ */
 public class BgColorWorker implements IWebWorker {
 
 	@Override

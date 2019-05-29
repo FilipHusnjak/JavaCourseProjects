@@ -11,6 +11,11 @@ import javax.imageio.ImageIO;
 import hr.fer.zemris.java.webserver.IWebWorker;
 import hr.fer.zemris.java.webserver.RequestContext;
 
+/**
+ * Web worker which draws red circle in a 200x200 pixels rectangle.
+ * 
+ * @author Filip Husnjak
+ */
 public class CircleWorker implements IWebWorker {
 
 	@Override

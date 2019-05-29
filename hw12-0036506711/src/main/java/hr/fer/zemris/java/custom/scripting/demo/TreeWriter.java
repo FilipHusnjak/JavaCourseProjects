@@ -17,6 +17,13 @@ import hr.fer.zemris.java.custom.scripting.parser.SmartScriptParserException;
 
 public class TreeWriter {
 
+	/**
+	 * Starts the program and expects one argument representing the path of
+	 * the file to be parsed.
+	 * 
+	 * @param args
+	 *        path of the file to be parsed
+	 */
 	public static void main(String[] args) {
 		if (args.length != 1) {
 			System.out.println("Program expects 1 argument representing filename!");
@@ -43,14 +50,16 @@ public class TreeWriter {
 	 */
 	private static class WriterVisitor implements INodeVisitor {
 		
+		/**
+		 * Represents the final document in text form
+		 */
 		private StringBuilder file = new StringBuilder();
 		
 		/**
-		 * Returns the expected {@code String} for {@code DocumentNode}.
+		 * Writes the expected {@code String} for {@code DocumentNode}.
 		 * 
 		 * @param text
 		 *        {@code DocumentNode} from which {@code String} should be created
-		 * @return the expected {@code String} for {@code DocumentNode}
 		 * @throws NullPointerException if the given {@code DocumentNode} is {@code null}
 		 */
 		@Override
@@ -65,11 +74,10 @@ public class TreeWriter {
 		}
 
 		/**
-		 * Returns the expected {@code String} for {@code ForLoopNode}.
+		 * Writes the expected {@code String} for {@code ForLoopNode}.
 		 * 
 		 * @param forLoop
 		 *        {@code ForLoopNode} from which {@code String} should be created
-		 * @return the expected {@code String} for {@code forLoopNode}
 		 * @throws NullPointerException if the given {@code ForLoopNode} is {@code null}
 		 */
 		@Override
@@ -89,11 +97,10 @@ public class TreeWriter {
 		}
 		
 		/**
-		 * Returns the expected {@code String} for {@code EchoNode}.
+		 * Writes the expected {@code String} for {@code EchoNode}.
 		 * 
 		 * @param echo
 		 *        {@code EchoNode} from which {@code String} should be created
-		 * @return the expected {@code String} for {@code EchoNode}
 		 * @throws NullPointerException if the given {@code EchoNode} is {@code null}
 		 */
 		@Override
@@ -107,11 +114,10 @@ public class TreeWriter {
 		}
 		
 		/**
-		 * Returns the expected {@code String} for {@code TextNode}.
+		 * Writes the expected {@code String} for {@code TextNode}.
 		 * 
 		 * @param text
 		 *        {@code TextNode} from which {@code String} should be created
-		 * @return the expected {@code String} for {@code TextNode}
 		 * @throws NullPointerException if the given {@code TextNode} is {@code null}
 		 */
 		@Override

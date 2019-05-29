@@ -59,7 +59,8 @@ public abstract class Node {
 	}
 	
 	/**
-	 * Support for visitor design pattern. Calls visit method upon given visitor object.
+	 * Support for visitor design pattern. Calls proper visit method upon given 
+	 * visitor object.
 	 * 
 	 * @param visitor
 	 *        visitor whose method gets called

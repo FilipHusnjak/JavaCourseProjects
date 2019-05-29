@@ -3,6 +3,12 @@ package hr.fer.zemris.java.webserver.workers;
 import hr.fer.zemris.java.webserver.IWebWorker;
 import hr.fer.zemris.java.webserver.RequestContext;
 
+/**
+ * Web worker which outputs html document that shows given parameters in a
+ * table.
+ * 
+ * @author Filip Husnjak
+ */
 public class EchoParams implements IWebWorker {
 
 	@Override

@@ -7,6 +7,12 @@ import java.util.Date;
 import hr.fer.zemris.java.webserver.IWebWorker;
 import hr.fer.zemris.java.webserver.RequestContext;
 
+/**
+ * Web worker which outputs hello message and number of characters of the given
+ * parameter.
+ * 
+ * @author Filip Husnjak
+ */
 public class HelloWorker implements IWebWorker {
 
 	@Override
