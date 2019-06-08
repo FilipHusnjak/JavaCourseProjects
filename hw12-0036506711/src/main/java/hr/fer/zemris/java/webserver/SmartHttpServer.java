@@ -111,6 +111,7 @@ public class SmartHttpServer {
 	private Thread cleaner = new Thread(() -> {
 		while (running) {
 			try {
+				// Sleep 5 minutes
 				Thread.sleep(300_000);
 			} catch (InterruptedException ignorable) {}
 			long currentTime = System.currentTimeMillis() / 1000;

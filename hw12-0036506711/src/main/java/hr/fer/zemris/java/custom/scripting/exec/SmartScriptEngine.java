@@ -176,7 +176,7 @@ public class SmartScriptEngine {
 			switch (function) {
 			case "sin":
 				double valueSin = stack.pop().doubleValue();
-				stack.push(new ValueWrapper(Math.sin(valueSin)));
+				stack.push(new ValueWrapper(Math.sin(Math.toRadians(valueSin))));
 				break;
 			case "decfmt":
 				DecimalFormat format = new DecimalFormat(stack.pop().toString());

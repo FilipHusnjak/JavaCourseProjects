@@ -323,6 +323,7 @@ public class RequestContext {
 		Objects.requireNonNull(data, "Given byte array cannot be null!");
 		// Generate header if its not generated
 		if (!headerGenerated) {
+			if (charset == null) charset = Charset.forName(encoding);
 			String header = generateHeader();
 			outputStream.write(header.getBytes(StandardCharsets.ISO_8859_1));
 			headerGenerated = true;
