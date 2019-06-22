@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="css/index.css">
+		<title>Gallery</title>
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="js/htmlescaping.js"></script>
+		<script type="text/javascript">//<!--
+			function getThumbnails(tag) {
+				$("#bigImage").html("");
+				$.ajax(
+					{
+						url: "rest/imagesForTag",
+						dataType: "json",
+						data: {
+		                    dummy: Math.random(),
+		                    tag: tag
+		                },
+						success: function(data) {
+							var thumbnails = data;
+							var html = "";
+							$(document).ready(function() {
+						        $('img.thumbnail').click(function() {
+						        	loadBigImage(this.id);
+						        });
+						    });
+							if(thumbnails.length == 0) {
+								html = "No thumbnails for the provided tag."
+							} else {
+								html += "<div class='galleryContainer'>";
+								for(var i = 0; i < thumbnails.length; ++i) {
+									html += "<span class='thumbnailContainer'><img class='thumbnail' src='servlet?id=" +
+											htmlEscape(thumbnails[i]) + "' id='" + htmlEscape(thumbnails[i]) + "'></span>";
+								}
+								html += "</div>";
+							}
+							$("#thumbnails").html(html);
+						}
+					}
+				);
+			}	
+		
+			function loadBigImage(id) {
+				$.ajax(
+					{
+						url: "rest/picture",
+						dataType: "json",
+						data: {
+		                    dummy: Math.random(),
+		                    id: id
+		                },
+						success: function(data) {
+							var picture = data;
+							let html = "<div class='imageContainer'>";
+							html += "<img class='image' src='rest/image?id=" + id + "'>";
+							html += "<div>Description: " + picture.description + "</div>";
+							html += "Tags:";
+							html += "<ul>";
+							for (var i = 0; i < picture.tags.length; ++i) {
+								html += "<li>" + picture.tags[i] + "</li>";
+							}
+							html += "</ul>";
+							html += "</div>";
+							$("#bigImage").html(html);
+						}
+					}
+				);
+			}
+		
+			$.ajax(
+				{
+					url: "rest/tags",
+					dataType: "json",
+					data: {
+	                    dummy: Math.random()
+	                },
+					success: function(data) {
+						var tags = data;
+						var html = "";
+						if(tags.length == 0) {
+							html = "No tags provided."
+						} else {
+							for(var i = 0; i < tags.length; ++i) {
+								html += "<button type='button' class='button' onclick='getThumbnails(\"" + htmlEscape(tags[i]) + "\")'>" + htmlEscape(tags[i]) + "</button>";
+							}
+						}
+						$("#tags").html(html);
+					}
+				}
+			);
+		//--></script>
+	</head>
+	<body>
+	
+		<h1><span class="title">Gallery</span></h1>
+		
+		<p>Choose tag:</p>
+		
+		<div id="tags">&nbsp;</div>
+		<div id="thumbnails">&nbsp;</div>
+		<div id="bigImage">&nbsp;</div>
+	</body>
+</html>
