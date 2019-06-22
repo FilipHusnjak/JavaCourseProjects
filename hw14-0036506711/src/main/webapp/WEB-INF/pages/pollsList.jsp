@@ -12,7 +12,7 @@
 	<h1>Ankete:</h1>
 	<ul>
 		<c:forEach var="v" items="${polls}">
-			<li><a href="glasanje?pollID=${v.ID}">${v.title}</li>
+			<li><a href="glasanje?pollID=${v.ID}">${v.title}</a></li>
 		</c:forEach>
 	</ul>
 </body>

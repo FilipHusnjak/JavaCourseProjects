@@ -46,12 +46,10 @@ public class SQLDAO implements DAO {
 		List<Poll> polls = new LinkedList<>();
 		Connection con = SQLConnectionProvider.getConnection();
 		String query = "SELECT * FROM Polls ORDER BY id";
-		try (PreparedStatement pst = con.prepareStatement(query)) {
-			try (ResultSet rs = pst.executeQuery()) {
-				while(rs != null && rs.next()) {
-					Poll poll = new Poll(rs.getLong(1), rs.getString(2), rs.getString(3));
-					polls.add(poll);
-				}
+		try (PreparedStatement pst = con.prepareStatement(query); ResultSet rs = pst.executeQuery()) {
+			while(rs != null && rs.next()) {
+				Poll poll = new Poll(rs.getLong(1), rs.getString(2), rs.getString(3));
+				polls.add(poll);
 			}
 		} catch(Exception ex) {
 			throw new DAOException("Pogreška prilikom dohvata liste korisnika.", ex);

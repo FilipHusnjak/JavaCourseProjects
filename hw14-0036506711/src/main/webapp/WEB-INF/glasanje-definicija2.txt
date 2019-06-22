@@ -1,0 +1,5 @@
+Metallica	https://www.youtube.com/watch?v=WbxH5S9_A3M	100
+Panthera	https://www.youtube.com/watch?v=i97OkCXwotE	90
+Iron Maiden	https://www.youtube.com/watch?v=SbWeP7KkeCU	100
+Black Sabbath	https://www.youtube.com/watch?v=5s7_WbiR79E	70
+Judas Priest	https://www.youtube.com/watch?v=yMVV_HsHcX0	50

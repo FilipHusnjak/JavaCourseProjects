@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
@@ -49,13 +50,12 @@ public class Inicijalizacija implements ServletContextListener {
 		try {
 			// Load and set proper driver
 			cpds.setDriverClass("org.apache.derby.jdbc.ClientDriver");
-			// Read properties and initialize cpds
-			readProperties(cpds, sce);
-			con = cpds.getConnection();
+			// Read properties, initialize cpds and get proper connection
+			con = readProperties(cpds, sce);
 			// Create tables if they does not exist
 			createProperTables(con);
 			// Insert initial element is Polls table is empty
-			insertProperElements(con);
+			insertProperElements(con, sce);
 		} catch (Exception e) {
 			throw new RuntimeException("Pogreška prilikom inicijalizacije poola.", e);
 		} finally {
@@ -88,23 +88,52 @@ public class Inicijalizacija implements ServletContextListener {
 	 * @param con
 	 *        {@link Connection} object used to insert data
 	 * @throws SQLException if data cannot be inserted
+	 * @throws IOException if I/O error occurs
 	 */
-	private void insertProperElements(Connection con) throws SQLException {
+	private void insertProperElements(Connection con, ServletContextEvent sce) 
+			throws SQLException, IOException {
 		// If Polls table is not empty return
 		if (!checkIfEmpty(con)) return;
 		// Insert voting poll into Polls table
-		long pollID = insertIntoPolls(con, "Glasanje za omiljeni bend", 
+		long pollID1 = insertIntoPolls(con, "Glasanje za omiljeni bend", 
 				"Od sljedećih bendova, koji Vam je bend najdraži? "
 				+ "Kliknite na link kako biste glasali!");
 		// Insert proper options for voting poll
-		insertIntoPollOptions(con, "The Beatles", "https://www.youtube.com/watch?v=z9ypq6_5bsg", pollID, 150);
-		insertIntoPollOptions(con, "The Platters", "https://www.youtube.com/watch?v=H2di83WAOhU", pollID, 60);
-		insertIntoPollOptions(con, "The Beach Boys", "https://www.youtube.com/watch?v=2s4slliAtQU", pollID, 150);
-		insertIntoPollOptions(con, "The Four Seasons", "https://www.youtube.com/watch?v=y8yvnqHmFds", pollID, 20);
-		insertIntoPollOptions(con, "The Marcels", "https://www.youtube.com/watch?v=qoi3TH59ZEs", pollID, 33);
-		insertIntoPollOptions(con, "The Everly Brothers", "https://www.youtube.com/watch?v=tbU3zdAgiX8", pollID, 25);
-		insertIntoPollOptions(con, "The Mamas And The Papas", "https://www.youtube.com/watch?v=N-aK6JnyFmk", pollID, 20);
-		insertIntoPolls(con, "Druga anketa", "Druga anketa opis");
+		loadFileIntoDatabase(con, sce, pollID1, "glasanje-definicija.txt");
+		long pollID2 = insertIntoPolls(con, "Glasanje za omiljeni metal bend", 
+				"Od sljedećih metal bendova, koji Vam je najdraži? "
+				+ "Kliknite na link kako biste glasali!");
+		loadFileIntoDatabase(con, sce, pollID2, "glasanje-definicija2.txt");
+	}
+	
+	/**
+	 * Inserts poll options read from the given file into the proper database.
+	 * 
+	 * @param con
+	 *        {@link Connection} object used to insert data
+	 * @param sce
+	 *        servlet context used to determine file path
+	 * @param pollID
+	 *        id of the poll which this options belong to
+	 * @param filename
+	 *        name of the file used to load options
+	 * @throws IOException if an I/O error occurs
+	 * @throws SQLException if there was an error when reaching database
+	 */
+	private void loadFileIntoDatabase(Connection con, ServletContextEvent sce, long pollID,
+			String filename) 
+			throws IOException, SQLException {
+		String fileNameBand = sce.getServletContext().getRealPath("/WEB-INF/" + filename);
+		Path pathBands = Paths.get(fileNameBand);
+		if (!Files.exists(pathBands)) {
+			return;
+		}
+		List<String> lines = Files.readAllLines(pathBands);
+		if (lines == null) return;
+		for (String line: lines) {
+			String[] parts = line.split("\\t+");
+			insertIntoPollOptions(con, parts[0], parts[1], pollID, Integer.parseInt(parts[2]));
+		}
 	}
 
 	/**
@@ -239,17 +268,20 @@ public class Inicijalizacija implements ServletContextListener {
 
 	/**
 	 * Reads properties from the properties file. Initializes given connection
-	 * pool with proper values read from the file.
+	 * pool with proper values read from the file. Returns proper connection after
+	 * initialization.
 	 * 
 	 * @param cpds
 	 *        connection pool to be initialized
 	 * @param sce
 	 *        servlet context used to determine file path
+	 * @return proper connection after initialization
 	 * @throws URISyntaxException if there was an error creating URI
 	 * @throws IOException if I/O error occurs
+	 * @throws SQLException if there was an error when reaching database
 	 */
-	private void readProperties(ComboPooledDataSource cpds, ServletContextEvent sce) 
-			throws URISyntaxException, IOException {
+	private Connection readProperties(ComboPooledDataSource cpds, ServletContextEvent sce) 
+			throws URISyntaxException, IOException, SQLException {
 		Path properties = Paths.get(sce.getServletContext().getRealPath(PROPERTIES));
 		Properties config = new Properties();
 		config.load(Files.newInputStream(properties));
@@ -260,6 +292,7 @@ public class Inicijalizacija implements ServletContextListener {
 		cpds.setJdbcUrl(uri.toString());
 		cpds.setUser(config.getProperty("user"));
 		cpds.setPassword(config.getProperty("password"));
+		return cpds.getConnection();
 	}
 
 }
