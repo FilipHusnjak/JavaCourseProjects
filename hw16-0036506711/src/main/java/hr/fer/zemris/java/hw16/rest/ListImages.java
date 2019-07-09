@@ -14,6 +14,12 @@ import com.google.gson.Gson;
 
 import hr.fer.zemris.java.hw16.util.ImageDatabase;
 
+/**
+ * REST API class used to get retrieve ids of images with specified tag given through
+ * request parameter.
+ * 
+ * @author Filip Husnjak
+ */
 @Path("/imagesForTag")
 public class ListImages {
 

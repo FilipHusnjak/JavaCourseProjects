@@ -1,9 +1,39 @@
-Sl03ag3.jpg
-Rio karneval 2015. godine
-rio, karneval, ljeto
-Sl4ho7i3.jpg
-Riječke maškare 2015. godine
-rijeka, ljeto, karneval
-Slk7izu34.jpg
-Odbojka na pijesku – turnir 2014. godine
-ljeto, odbojka
+celebrity1.jpg
+Leo Messi
+celebrities, sports, tag1
+celebrity2.jpg
+Cristiano Ronaldo
+celebrities, sports, tag1
+celebrity3.jpg
+Slash
+celebrities, music, tag1, tag2
+band1.jpg
+Metallica
+bands, music, tag1, tag2
+band2.jpg
+Panthera
+bands, music
+city1.jpg
+City of Edmonton
+cities, summer
+city2.jpg
+American city
+cities
+nature1.jpg
+Beautiful nature
+summer, nature
+nature2.jpg
+Woods
+nature, woods
+sports1.jpg
+Sports equipment
+sports, summer
+sports2.jpg
+Football
+sports
+sweden1.jpg
+Stockholm
+sweden, cities, nature
+sweden2.jpg
+Church
+sweden, cities

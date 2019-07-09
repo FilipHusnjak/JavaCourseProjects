@@ -29,7 +29,7 @@
         </configuration>
       </plugin>
     </plugins>
-    <finalName>galerija</finalName>
+    <finalName>moja-galerija</finalName>
   </build>
   
   <dependencies>

@@ -17,14 +17,37 @@ import javax.servlet.http.HttpServletRequest;
 
 import hr.fer.zemris.java.hw16.model.Picture;
 
+/**
+ * Represents database which loads images and their information. Also is able
+ * to return images for more specified request like images with some id/name or
+ * images with given tag.
+ * 
+ * @author Filip Husnjak
+ */
 public class ImageDatabase {
 	
+	/**
+	 * Loads lines from txt file that represent description of each image.
+	 * 
+	 * @param request
+	 *        request object used to get real path on disk to the proper file
+	 * @return List of lines read from the file
+	 * @throws IOException if an I/O error occurs.
+	 */
 	private synchronized static List<String> getLines(HttpServletRequest request) 
 			throws IOException {
 		return Files.readAllLines(Paths.get(
 				request.getServletContext().getRealPath("/WEB-INF/opisnik.txt")));
 	}
 
+	/**
+	 * Loads all tags that images belong to. There are no duplicates in result array.
+	 * 
+	 * @param request
+	 *        request object used to get real path on disk to the proper file
+	 * @return array of tags
+	 * @throws IOException if an I/O error occurs.
+	 */
 	public static String[] loadTags(HttpServletRequest request) throws IOException {
 		List<String> lines = getLines(request);
 		Set<String> tags = new HashSet<>();
@@ -34,6 +57,16 @@ public class ImageDatabase {
 		return tags.toArray(String[]::new);
 	}
 	
+	/**
+	 * Returns array of image ids that belong to the given tag.
+	 * 
+	 * @param request
+	 *        request object used to get real path on disk to the proper file
+	 * @param tag
+	 *        tag used for search
+	 * @return array of image ids that belong to the given tag
+	 * @throws IOException if an I/O error occurs.
+	 */
 	public static String[] imagesForTag(HttpServletRequest request, String tag) 
 			throws IOException {
 		List<String> lines = getLines(request);
@@ -46,7 +79,14 @@ public class ImageDatabase {
 		return images.toArray(String[]::new);
 	}
 	
-	public static BufferedImage createThumbnail(BufferedImage image) {
+	/**
+	 * Creates smaller image from the given one. New images has size of 150x150.
+	 * 
+	 * @param image
+	 *        images whose thumbnail is to be created
+	 * @return thumbnail of the given image
+	 */
+	private static BufferedImage createThumbnail(BufferedImage image) {
 		Image tmp = image.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         BufferedImage resized = new BufferedImage(150, 150, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = resized.createGraphics();
@@ -55,6 +95,16 @@ public class ImageDatabase {
 		return resized;
 	}
 	
+	/**
+	 * Returns {@link Picture} object with specified ID.
+	 * 
+	 * @param request
+	 *        request object used to get real path on disk to the proper file
+	 * @param id
+	 *        id of the object to be returned
+	 * @return {@link Picture} object with specified ID
+	 * @throws IOException if an I/O error occurs.
+	 */
 	public static Picture loadPictureForId(HttpServletRequest request, String id) 
 			throws IOException {
 		List<String> lines = getLines(request);
@@ -68,12 +118,33 @@ public class ImageDatabase {
 		return null;
 	}
 	
+	/**
+	 * Loads image with the given ID.
+	 * 
+	 * @param request
+	 *        request object used to get real path on disk to the proper file
+	 * @param id
+	 *        id of the image to be returned
+	 * @return image with specified ID
+	 * @throws IOException if an I/O error occurs.
+	 */
 	public synchronized static BufferedImage loadImageWithId(HttpServletRequest req, String id) 
 			throws IOException {
 		return ImageIO.read(Files.newInputStream(
 				Paths.get(req.getServletContext().getRealPath("/WEB-INF/slike/" + id))));
 	}
 	
+	/**
+	 * Loads thumbnail with specified ID. If thumbnail with specified ID does not
+	 * exist it is created first time its ID is requested.
+	 * 
+	 * @param req
+	 *        request object used to get real path on disk to the proper file
+	 * @param id
+	 *        id of the thumbnail to be returned
+	 * @return thumbnail with specified ID
+	 * @throws IOException if an I/O error occurs.
+	 */
 	public synchronized static BufferedImage loadThumbnailWithId(HttpServletRequest req, String id) 
 			throws IOException {
 		Path thumbnails = Paths.get(req.getServletContext().getRealPath("/WEB-INF/thumbnails"));

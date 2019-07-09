@@ -15,6 +15,12 @@ import com.google.gson.Gson;
 import hr.fer.zemris.java.hw16.model.Picture;
 import hr.fer.zemris.java.hw16.util.ImageDatabase;
 
+/**
+ * REST API class used to get retrieve picture object with specified ID given through
+ * request parameter.
+ * 
+ * @author Filip Husnjak
+ */
 @Path("/picture")
 public class GetPicture {
 

@@ -13,6 +13,11 @@ import com.google.gson.Gson;
 
 import hr.fer.zemris.java.hw16.util.ImageDatabase;
 
+/**
+ * REST API class used to get retrieve all tags which images belong to.
+ * 
+ * @author Filip Husnjak
+ */
 @Path("/tags")
 public class TagList {
 

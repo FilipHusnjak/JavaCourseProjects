@@ -12,6 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import hr.fer.zemris.java.hw16.util.ImageDatabase;
 
+/**
+ * Servlet used to load thumbnail of the image with specified ID given
+ * through request parameter.
+ * 
+ * @author Filip Husnjak
+ */
 @WebServlet("/servlet")
 public class LoadThumbnailsServlet extends HttpServlet {
 
